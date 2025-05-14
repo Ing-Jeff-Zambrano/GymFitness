@@ -1,0 +1,7 @@
+*.pyc
+__pycache__/
+myvenv/  # Si usaste un entorno virtual llamado 'myvenv'
+db.sqlite3
+*.log
+*.swp
+.DS_Store
