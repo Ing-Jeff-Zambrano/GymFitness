@@ -4,19 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="78be801e-6813-467b-8fa0-4390f094cbe2" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Nutricion/urls.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Perfil/templates/layouts/base-fullscreen.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Perfil/templates/perfil/login.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Perfil/urls.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Progreso/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/Gym_Fitness.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Gym_Fitness.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Gym_Fitness/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/Gym_Fitness/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Gym_Fitness/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/Gym_Fitness/urls.py" afterDir="false" />
-    </list>
+    <list default="true" id="78be801e-6813-467b-8fa0-4390f094cbe2" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -110,7 +98,7 @@
       <workItem from="1747256079883" duration="8109000" />
       <workItem from="1747845242692" duration="4679000" />
       <workItem from="1747849971473" duration="491000" />
-      <workItem from="1747854339384" duration="1224000" />
+      <workItem from="1747854339384" duration="1572000" />
     </task>
     <servers />
   </component>
