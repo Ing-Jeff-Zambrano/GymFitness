@@ -4,68 +4,67 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="37d005eb-2f06-4cd7-8678-063ef010b82b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/Gym_Fitness.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Gym_Fitness/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Gym_Fitness/asgi.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Gym_Fitness/settings.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Gym_Fitness/urls.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Gym_Fitness/wsgi.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/manage.py" afterDir="false" />
+    <list default="true" id="78be801e-6813-467b-8fa0-4390f094cbe2" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Nutricion/urls.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Perfil/templates/layouts/base-fullscreen.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Perfil/templates/perfil/login.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Perfil/urls.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Progreso/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/Gym_Fitness.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Gym_Fitness.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Gym_Fitness/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/Gym_Fitness/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Gym_Fitness/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/Gym_Fitness/urls.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="DjangoConsoleOptions" custom-start-script="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)">
-    <option name="myCustomStartScript" value="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)" />
-  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "Ing-Jeff-Zambrano"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Ing-Jeff-Zambrano&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/Ing-Jeff-Zambrano/Gym_fitness.git",
-    "accountId": "2ca21abc-e6e5-4d82-911e-b120649885bd"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Ing-Jeff-Zambrano/Gym_fitness.git&quot;,
+    &quot;accountId&quot;: &quot;2ca21abc-e6e5-4d82-911e-b120649885bd&quot;
   }
-}]]></component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 1
-}]]></component>
-  <component name="ProjectId" id="2x5zVJ8sUiHsC3CChSaLeTl7Fba" />
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 1
+}</component>
+  <component name="ProjectId" id="2x6QWwrKhXktB9fQsEPrxmnqkTQ" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Django Server.Gym_Fitness.executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.OpenDjangoStructureViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Django Server.Gym_Fitness.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenDjangoStructureViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;django.template.preview.state&quot;: &quot;SHOW_EDITOR_AND_PREVIEW&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="Gym_Fitness" type="Python.DjangoServer" factoryName="Django server">
       <module name="Gym_Fitness" />
@@ -103,12 +102,15 @@
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="37d005eb-2f06-4cd7-8678-063ef010b82b" name="Changes" comment="" />
-      <created>1747242745154</created>
+      <changelist id="78be801e-6813-467b-8fa0-4390f094cbe2" name="Changes" comment="" />
+      <created>1747256078859</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1747242745154</updated>
-      <workItem from="1747242746183" duration="1004000" />
+      <updated>1747256078859</updated>
+      <workItem from="1747256079883" duration="8109000" />
+      <workItem from="1747845242692" duration="4679000" />
+      <workItem from="1747849971473" duration="491000" />
+      <workItem from="1747854339384" duration="1224000" />
     </task>
     <servers />
   </component>
