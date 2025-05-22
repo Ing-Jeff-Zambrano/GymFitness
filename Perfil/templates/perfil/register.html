@@ -11,19 +11,7 @@
             <div class="col-lg-6 col-md-8">
                 <div class="card bg-secondary border-0">
                     {% if not success %}
-                    <div class="card-header bg-transparent pb-5">
-                        <div class="text-muted text-center mt-2 mb-4 credentials-text"><small>Or sign up with credentials</small></div>
-                        <div class="text-center social-auth">
-                            <a href="#" class="btn btn-neutral btn-icon mr-4">
-                                <span class="btn-inner--icon"><img src="/static/assets/img/icons/common/github.svg"></span>
-                                <span class="btn-inner--text">Github</span>
-                            </a>
-                            <a href="#" class="btn btn-neutral btn-icon">
-                                <span class="btn-inner--icon"><img src="/static/assets/img/icons/common/google.svg"></span>
-                                <span class="btn-inner--text">Google</span>
-                            </a>
-                        </div>
-                    </div>
+
                     {% endif %}
                     <div class="card-body px-lg-5 py-lg-5">
                         <div class="text-center text-muted mb-4 credentials-text-top">
@@ -119,14 +107,7 @@
                         {% endif %}
                     </div>
                 </div>
-                <div class="row mt-3">
-                    <div class="col-6">
-                        <a href="#" class="text-light"><small>Forgot password?</small></a>
-                    </div>
-                    <div class="col-6 text-right">
-                        <a href="{% url 'login' %}" class="text-light"><small>Already have an account?</small></a>
-                    </div>
-                </div>
+
             </div>
         </div>
     </div>
