@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
-
 class Usuario(AbstractUser):
     fecha_nacimiento = models.DateField()
     sexo = models.CharField(
@@ -17,7 +16,6 @@ class Usuario(AbstractUser):
     github_id = models.CharField(max_length=255, unique=True, blank=True, null=True)
     google_id = models.CharField(max_length=255, unique=True, blank=True, null=True)
     tipo_cuerpo = models.CharField(max_length=50, blank=True, null=True)
-
     groups = models.ManyToManyField(
         'auth.Group',
         verbose_name=('groups'),
@@ -26,7 +24,7 @@ class Usuario(AbstractUser):
             'The groups this user belongs to. A user will get all permissions '
             'granted to each of their groups.'
         ),
-        related_name="gym_fitness_user_set",  # Añade un related_name único
+        related_name="gym_fitness_user_set",
         related_query_name="user",
     )
     user_permissions = models.ManyToManyField(
@@ -34,7 +32,7 @@ class Usuario(AbstractUser):
         verbose_name=('user permissions'),
         blank=True,
         help_text=('Specific permissions for this user.'),
-        related_name="gym_fitness_user_perm_set",  # Añade un related_name único
+        related_name="gym_fitness_user_perm_set",
         related_query_name="user",
     )
 

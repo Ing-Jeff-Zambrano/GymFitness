@@ -10,9 +10,10 @@
         <div class="row justify-content-center">
             <div class="col-lg-6 col-md-8">
                 <div class="card bg-secondary border-0">
+                    {% if not success %}
                     <div class="card-header bg-transparent pb-5">
-                        <div class="text-muted text-center mt-2 mb-4"><small>Sign up with</small></div>
-                        <div class="text-center">
+                        <div class="text-muted text-center mt-2 mb-4 credentials-text"><small>Or sign up with credentials</small></div>
+                        <div class="text-center social-auth">
                             <a href="#" class="btn btn-neutral btn-icon mr-4">
                                 <span class="btn-inner--icon"><img src="/static/assets/img/icons/common/github.svg"></span>
                                 <span class="btn-inner--text">Github</span>
@@ -23,51 +24,107 @@
                             </a>
                         </div>
                     </div>
+                    {% endif %}
                     <div class="card-body px-lg-5 py-lg-5">
-                        <div class="text-center text-muted mb-4">
-                            <small>Or sign up with credentials</small>
+                        <div class="text-center text-muted mb-4 credentials-text-top">
+                            <small>Sign UP</small>
                         </div>
-                        <form role="form" action="{% url 'register' %}" method="post">
-                            {% csrf_token %}
-                            <div class="form-group">
-                                <div class="input-group input-group-merge input-group-alternative mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="ni ni-hat-3"></i></span>
-                                    </div>
-                                    <input class="form-control" placeholder="Name" type="text" name="username" required>
+                        {% if success %}
+                            <div class="text-center">
+                                <div class="alert alert-info" role="alert">
+                                    Usuario Creado - Por favor <a href="/">login</a>.
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <div class="input-group input-group-merge input-group-alternative mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="ni ni-email-83"></i></span>
-                                    </div>
-                                    <input class="form-control" placeholder="Email" type="email" name="email" required>
+                            <style>
+                                .social-auth, .credentials-text, .credentials-text-top {
+                                    display: none;
+                                }
+                            </style>
+                        {% else %}
+                            {% if form.errors %}
+                                <div class="alert alert-danger" role="alert">
+                                    {% for field in form %}
+                                        {% if field.errors %}
+                                            <strong>{{ field.label }}</strong>: {{ field.errors }}<br>
+                                        {% endif %}
+                                    {% endfor %}
+                                    {{ form.non_field_errors }}
                                 </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="input-group input-group-merge input-group-alternative">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
+                            {% endif %}
+                            <form role="form" method="post" action="{% url 'register' %}">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <div class="input-group input-group-merge input-group-alternative mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="ni ni-single-02"></i></span>
+                                        </div>
+                                        {{ form.username }}
                                     </div>
-                                    <input class="form-control" placeholder="Password" type="password" name="password" required>
                                 </div>
-                            </div>
-                            <div class="text-muted font-italic"><small>password strength: <span class="text-success font-weight-700">strong</span></small></div>
-                            <div class="row my-4">
+                                <div class="form-group">
+                                    <div class="input-group input-group-merge input-group-alternative mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="ni ni-hat-3"></i></span>
+                                        </div>
+                                        {{ form.first_name }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="input-group input-group-merge input-group-alternative mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="ni ni-badge"></i></span>
+                                        </div>
+                                        {{ form.last_name }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="input-group input-group-merge input-group-alternative mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="ni ni-email-83"></i></span>
+                                        </div>
+                                        {{ form.email }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="input-group input-group-merge input-group-alternative">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
+                                        </div>
+                                        {{ form.password1 }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="input-group input-group-merge input-group-alternative">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
+                                        </div>
+                                        {{ form.password2 }}
+                                    </div>
+                                </div>
+                                <div class="text-muted font-italic"><small>password strength: <span class="text-success font-weight-700">strong</span></small></div>
+                                <div class="row my-4">
                                 <div class="col-12">
                                     <div class="custom-control custom-control-alternative custom-checkbox">
-                                        <input class="custom-control-input" id="customCheckRegister" type="checkbox">
+                                        <input class="custom-control-input" id="customCheckRegister" type="checkbox" name="{{ form.agree_terms.name }}" {% if form.agree_terms.value %}checked{% endif %}>
                                         <label class="custom-control-label" for="customCheckRegister">
                                             <span class="text-muted">I agree with the <a href="#!">Privacy Policy</a></span>
                                         </label>
                                     </div>
                                 </div>
                             </div>
-                            <div class="text-center">
-                                <button type="submit" class="btn btn-primary mt-4">Create account</button>
-                            </div>
-                        </form>
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-primary mt-4">Create account</button>
+                                </div>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-6">
+                        <a href="#" class="text-light"><small>Forgot password?</small></a>
+                    </div>
+                    <div class="col-6 text-right">
+                        <a href="{% url 'login' %}" class="text-light"><small>Already have an account?</small></a>
                     </div>
                 </div>
             </div>
