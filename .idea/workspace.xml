@@ -6,6 +6,14 @@
   <component name="ChangeListManager">
     <list default="true" id="78be801e-6813-467b-8fa0-4390f094cbe2" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Nutricion/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/nutricion/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Nutricion/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/nutricion/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Nutricion/apps.py" beforeDir="false" afterPath="$PROJECT_DIR$/nutricion/apps.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Nutricion/migrations/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/nutricion/migrations/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Nutricion/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/nutricion/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Nutricion/tests.py" beforeDir="false" afterPath="$PROJECT_DIR$/nutricion/tests.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Nutricion/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/nutricion/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Nutricion/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/nutricion/views.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,25 +49,25 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Django Server.Gym_Fitness.executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.OpenDjangoStructureViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.pycharm.django.structure.promotion.once.per.project": "true",
-    "django.template.preview.state": "SHOW_EDITOR_AND_PREVIEW",
-    "git-widget-placeholder": "main",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Django Server.Gym_Fitness.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenDjangoStructureViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.pycharm.django.structure.promotion.once.per.project&quot;: &quot;true&quot;,
+    &quot;django.template.preview.state&quot;: &quot;SHOW_EDITOR_AND_PREVIEW&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="Gym_Fitness" type="Python.DjangoServer" factoryName="Django server">
       <module name="Gym_Fitness" />
@@ -110,6 +118,8 @@
       <workItem from="1747920426429" duration="8284000" />
       <workItem from="1747946546587" duration="40000" />
       <workItem from="1747946682105" duration="2220000" />
+      <workItem from="1747972908278" duration="970000" />
+      <workItem from="1747973897882" duration="1227000" />
     </task>
     <servers />
   </component>
