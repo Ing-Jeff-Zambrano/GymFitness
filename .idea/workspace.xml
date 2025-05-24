@@ -5,17 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="78be801e-6813-467b-8fa0-4390f094cbe2" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Perfil/templates/layouts/base.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Perfil/templates/perfil/dashboard.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/includes/footer.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/includes/navigation.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/includes/sidenav.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Perfil/templates/perfil/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/Perfil/templates/perfil/login.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Perfil/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/Perfil/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Perfil/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/Perfil/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/includes/sidenav.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/includes/sidenav.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,12 +23,12 @@
     &quot;assignee&quot;: &quot;Ing-Jeff-Zambrano&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/Ing-Jeff-Zambrano/Gym_fitness.git&quot;,
-    &quot;accountId&quot;: &quot;2ca21abc-e6e5-4d82-911e-b120649885bd&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/Ing-Jeff-Zambrano/GymFitness.git",
+    "accountId": "2ca21abc-e6e5-4d82-911e-b120649885bd"
   }
-}</component>
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 1
 }</component>
@@ -115,6 +107,7 @@
       <workItem from="1747920426429" duration="8284000" />
       <workItem from="1747946546587" duration="40000" />
       <workItem from="1747946682105" duration="2220000" />
+      <workItem from="1748057699171" duration="3143000" />
     </task>
     <servers />
   </component>
