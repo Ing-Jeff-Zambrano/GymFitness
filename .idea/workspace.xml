@@ -4,22 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="78be801e-6813-467b-8fa0-4390f094cbe2" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Perfil/templates/layouts/base.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Perfil/templates/perfil/dashboard.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/includes/footer.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/includes/navigation.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/includes/sidenav.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Gym_Fitness/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/Gym_Fitness/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Perfil/templates/perfil/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/Perfil/templates/perfil/login.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Perfil/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/Perfil/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Perfil/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/Perfil/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Progreso/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/Progreso/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nutricion/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/nutricion/views.py" afterDir="false" />
-    </list>
+    <list default="true" id="78be801e-6813-467b-8fa0-4390f094cbe2" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -59,7 +44,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "django.template.preview.state": "SHOW_EDITOR_AND_PREVIEW",
-    "git-widget-placeholder": "Merging main",
+    "git-widget-placeholder": "main",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -120,6 +105,7 @@
       <workItem from="1747946682105" duration="2220000" />
       <workItem from="1748057699171" duration="3339000" />
       <workItem from="1748220446494" duration="8896000" />
+      <workItem from="1748260292103" duration="759000" />
     </task>
     <servers />
   </component>
