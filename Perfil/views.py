@@ -52,3 +52,7 @@ def dashboard(request):
 def logout(request):
     logout(request)
     return redirect('login')
+
+@login_required
+def perfil(request):
+    return render(request, 'perfil/perfil.html')

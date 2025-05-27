@@ -5,9 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="78be801e-6813-467b-8fa0-4390f094cbe2" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Perfil/templates/perfil/perfil.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Gym_Fitness/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/Gym_Fitness/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/includes/navigation.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/includes/navigation.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/includes/sidenav.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/includes/sidenav.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

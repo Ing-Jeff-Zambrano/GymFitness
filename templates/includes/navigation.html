@@ -207,16 +207,13 @@
             <div class="dropdown-header noti-title">
               <h6 class="text-overflow m-0">Welcome!</h6>
             </div>
-            <a href="/profile.html" class="dropdown-item">
+            <a href="{% url 'perfil' %}" class="dropdown-item">
               <i class="ni ni-single-02"></i>
-              <span>My profile</span>
+              <span>Mi Perfil</span>
             </a>
-            <a target="_blank" href="http://appseed.us/support" class="dropdown-item">
-              <i class="ni ni-support-16"></i>
-              <span>Support</span>
-            </a>
+
             <div class="dropdown-divider"></div>
-            <a href="{% url 'logout' %}" class="dropdown-item">
+            <a href="{% url 'login' %}" class="dropdown-item">
               <i class="ni ni-user-run text-red"></i>
               <span>Logout</span>
             </a>
