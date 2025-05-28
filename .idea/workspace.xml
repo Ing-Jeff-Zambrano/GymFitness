@@ -5,9 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="78be801e-6813-467b-8fa0-4390f094cbe2" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Progreso/templates/progreso/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Gym_Fitness/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/Gym_Fitness/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Perfil/templates/perfil/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/Perfil/templates/perfil/dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Perfil/templates/perfil/perfil.html" beforeDir="false" afterPath="$PROJECT_DIR$/Perfil/templates/perfil/perfil.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Progreso/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/Progreso/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Progreso/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/Progreso/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/perfil/templates/perfil/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/perfil/templates/perfil/dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/includes/footer.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/includes/navigation-fullscreen.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/includes/navigation-fullscreen.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/includes/navigation.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/includes/navigation.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -109,7 +117,7 @@
       <workItem from="1747946682105" duration="2220000" />
       <workItem from="1748057699171" duration="3339000" />
       <workItem from="1748220446494" duration="8896000" />
-      <workItem from="1748437909518" duration="2592000" />
+      <workItem from="1748437909518" duration="7337000" />
     </task>
     <servers />
   </component>
