@@ -1,9 +1,24 @@
 {% extends 'layouts/base.html' %}
+{% load static %}
 
 {% block title %} Nutricion {% endblock title %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" href="{% static 'assets/css/nutricion.css' %}">
+{% endblock stylesheets %}
 
 {% block content %}
-
-{% include "includes/footer-fullscreen.html" %}
+    <div class="full-background">
+        <div class="content-wrapper">
+            <h1>Bienvenido a tu Seccion de Nutricion</h1>
+            <h1>{{ request.user.username|upper }}</h1>
+            <p>Aquí podrás ver tus rutinas y dietas alimenticias</p>
+            <p>¡Es hora de darle con todo a tu salud dietetica!</p>
+            <a href="#" class="btn-empezar">Empezar</a>
+        </div>
+    </div>
+    {% include "includes/footer-fullscreen.html" %}
 {% endblock content %}
+
+{% block javascripts %}
+{% endblock javascripts %}
