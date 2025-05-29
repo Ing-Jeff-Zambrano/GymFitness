@@ -4,6 +4,12 @@
 {% block title %} Progreso {% endblock title %}
 
 {% block stylesheets %}
+    {{ block.super }}
+    <style>
+      nav.navbar.navbar-top.navbar-dark.bg-primary.border-bottom {
+        background-color: black !important; /* O el color que prefieras */
+      }
+    </style>
     <link rel="stylesheet" href="{% static 'assets/css/progreso.css' %}">
 {% endblock stylesheets %}
 

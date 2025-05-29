@@ -44,3 +44,6 @@
     background-color: #e65100;
     transform: scale(1.05);
 }
+nav.navbar.navbar-top.navbar-dark.bg-primary.border-bottom {
+  background-color: black !important; /* Gris oscuro */
+}
