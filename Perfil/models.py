@@ -13,9 +13,8 @@ class Usuario(AbstractUser):
     )
     direccion = models.CharField(max_length=255, blank=True, null=True)
     telefono = models.CharField(max_length=20, blank=True, null=True)
-    github_id = models.CharField(max_length=255, unique=True, blank=True, null=True)
-    google_id = models.CharField(max_length=255, unique=True, blank=True, null=True)
-    tipo_cuerpo = models.CharField(max_length=50, blank=True, null=True)
+    ciudad = models.CharField(max_length=100, blank=True, null=True)  # Nuevo campo
+    pais = models.CharField(max_length=100, blank=True, null=True)    # Nuevo campo
     groups = models.ManyToManyField(
         'auth.Group',
         verbose_name=('groups'),
@@ -38,3 +37,15 @@ class Usuario(AbstractUser):
 
     def __str__(self):
         return self.username
+
+class MedicionCuerpo(models.Model):
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='mediciones_cuerpo')
+    fecha_medicion = models.DateTimeField(auto_now_add=True)
+    ancho_hombros = models.FloatField(blank=True, null=True)
+    ancho_caderas = models.FloatField(blank=True, null=True)
+    icc_estimado = models.FloatField(blank=True, null=True)
+    relacion_hombro_cintura = models.FloatField(blank=True, null=True)
+    tipo_cuerpo = models.CharField(max_length=50, blank=True, null=True)
+
+    def __str__(self):
+        return f"Medición de {self.usuario.username} el {self.fecha_medicion.strftime('%Y-%m-%d %H:%M:%S')}"

@@ -5,6 +5,8 @@ from django.contrib.auth import login
 from django.contrib import messages
 from .forms import SignUpForm, LoginForm
 from django.contrib.auth.decorators import login_required
+from datetime import date, datetime
+
 
 
 def login_view(request):
@@ -33,11 +35,13 @@ def register(request):
     if request.method == "POST":
         form = SignUpForm(request.POST)
         if form.is_valid():
-            form.save()
-            msg = 'User created - please <a href="/">login</a>.'
+            user = form.save(commit=False)
+            user.fecha_nacimiento = date.today()  # Establecer la fecha actual como predeterminada
+            user.save()
+            msg = 'Usuario creado - por favor, <a href="/">inicia sesión</a>.'
             success = True
         else:
-            msg = 'Form is not valid'
+            msg = 'El formulario no es válido'
     else:
         form = SignUpForm()
     return render(request, 'perfil/register.html', {"form": form, "msg": msg, "success": success})
@@ -55,4 +59,32 @@ def logout(request):
 
 @login_required
 def perfil(request):
-    return render(request, 'perfil/perfil.html')
+    if request.method == 'POST':
+        user = request.user
+        user.first_name = request.POST.get('first_name', user.first_name)
+        user.last_name = request.POST.get('last_name', user.last_name)
+        user.direccion = request.POST.get('direccion', user.direccion)
+        user.telefono = request.POST.get('telefono', user.telefono)
+        fecha_nacimiento_str = request.POST.get('fecha_nacimiento')
+        sexo = request.POST.get('sexo')
+        user.ciudad = request.POST.get('ciudad', user.ciudad)  # Guardar ciudad
+        user.pais = request.POST.get('pais', user.pais)      # Guardar país
+
+        if fecha_nacimiento_str:
+            try:
+                user.fecha_nacimiento = datetime.strptime(fecha_nacimiento_str, '%Y-%m-%d').date()
+            except ValueError:
+                messages.error(request, 'Formato de fecha de nacimiento inválido.')
+                return redirect('perfil')
+
+        if sexo in ['M', 'F', 'O']:
+            user.sexo = sexo
+        else:
+            messages.error(request, 'Selección de sexo inválida.')
+            return redirect('perfil')
+
+        user.save()
+        messages.success(request, 'Perfil actualizado exitosamente.')
+        return redirect('perfil')
+    else:
+        return render(request, 'perfil/perfil.html')
