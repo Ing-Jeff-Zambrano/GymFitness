@@ -73,6 +73,17 @@
             <div class="h5">
               <i class="ni ni-ruler-pencil mr-2"></i> Estatura: {{ user.estatura|default:"No especificada" }} cm
             </div>
+          {% if ultima_medicion %}
+            <div class="mt-4">
+              <h5>Última Medición Corporal</h5>
+              <p><i class="ni ni-body-1 mr-2"></i> Tipo de Cuerpo Estimado: {{ ultima_medicion.tipo_cuerpo|default:"No determinado" }}</p>
+              <p><i class="ni ni-ruler mr-2"></i> Ancho de Hombros: {{ ultima_medicion.ancho_hombros|floatformat:2|default:"No medido" }} px</p>
+              <p><i class="ni ni-ruler mr-2"></i> Ancho de Caderas: {{ ultima_medicion.ancho_caderas|floatformat:2|default:"No medido" }} px</p>
+              {% if ultima_medicion.relacion_hombro_cintura %}
+              <p><i class="ni ni-settings mr-2"></i> Relación Hombro-Cintura: {{ ultima_medicion.relacion_hombro_cintura|floatformat:2 }}</p>
+              {% endif %}
+            </div>
+            {% endif %}
           </div>
         </div>
       </div>
@@ -180,7 +191,7 @@
                   </div>
                     <div class="form-group">
                       <label class="form-control-label">Detectar Tipo de Cuerpo</label>
-                      <button type="button" class="btn btn-info">Iniciar Detección de Tipo de Cuerpo</button>
+                      <button id="detect-body-type" type="button" class="btn btn-info">Iniciar Detección de Tipo de Cuerpo</button>
                       <p class="mt-2">Al hacer clic aquí, se iniciará el proceso para tomar varias fotos y estimar tu tipo de cuerpo.</p>
                       </div>
                 </div>

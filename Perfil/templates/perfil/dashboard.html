@@ -2,12 +2,10 @@
 
 {% block title %} Dashboard {% endblock title %}
 
-<!-- Specific CSS goes HERE -->
 {% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
 
-    <!-- Header -->
     <div class="header bg-primary pb-6">
       <div class="container-fluid">
         <div class="header-body">
@@ -24,11 +22,9 @@
             </div>
 
           </div>
-          <!-- Card stats -->
           <div class="row">
             <div class="col-xl-3 col-md-6">
               <div class="card card-stats">
-                <!-- Card body -->
                 <div class="card-body">
                   <div class="row">
                     <div class="col">
@@ -47,26 +43,29 @@
             </div>
             <div class="col-xl-3 col-md-6">
               <div class="card card-stats">
-                <!-- Card body -->
                 <div class="card-body">
                   <div class="row">
                     <div class="col">
                       <h5 class="card-title text-uppercase text-muted mb-0">Tipo de Cuerpo</h5>
-                      <span class="h2 font-weight-bold mb-0">Endomorfo</span>
+                      <span class="h2 font-weight-bold mb-0">
+                        {% if tipo_cuerpo %}
+                          {{ tipo_cuerpo|default:"No determinado" }}
+                        {% else %}
+                          No determinado
+                        {% endif %}
+                      </span>
                     </div>
                     <div class="col-auto">
                       <div class="icon icon-shape bg-gradient-orange text-white rounded-circle shadow">
-                        <i class="ni ni-badge"></i>
+                        <i class="ni ni-body-1"></i>
                       </div>
                     </div>
                   </div>
-
                 </div>
               </div>
             </div>
             <div class="col-xl-3 col-md-6">
               <div class="card card-stats">
-                <!-- Card body -->
                 <div class="card-body">
                   <div class="row">
                     <div class="col">
@@ -85,7 +84,6 @@
             </div>
             <div class="col-xl-3 col-md-6">
               <div class="card card-stats">
-                <!-- Card body -->
                 <div class="card-body">
                   <div class="row">
                     <div class="col">
@@ -107,7 +105,6 @@
       </div>
     </div>
 
-    <!-- Page content -->
     <div class="container-fluid mt--6">
       <div class="row">
         <div class="col-xl-8">
@@ -137,9 +134,7 @@
               </div>
             </div>
             <div class="card-body">
-              <!-- Chart -->
               <div class="chart">
-                <!-- Chart wrapper -->
                 <canvas id="chart-sales-dark" class="chart-canvas"></canvas>
               </div>
             </div>
@@ -156,7 +151,6 @@
               </div>
             </div>
             <div class="card-body">
-              <!-- Chart -->
               <div class="chart">
                 <canvas id="chart-bars" class="chart-canvas"></canvas>
               </div>
@@ -178,7 +172,6 @@
               </div>
             </div>
             <div class="table-responsive">
-              <!-- Projects table -->
               <table class="table align-items-center table-flush">
                 <thead class="thead-light">
                   <tr>
@@ -277,7 +270,6 @@
               </div>
             </div>
             <div class="table-responsive">
-              <!-- Projects table -->
               <table class="table align-items-center table-flush">
                 <thead class="thead-light">
                   <tr>
@@ -390,7 +382,6 @@
 
 {% endblock content %}
 
-<!-- Specific JS goes HERE -->
 {% block javascripts %}
 
   <script src="/static/assets/vendor/chart.js/dist/Chart.min.js"></script>
