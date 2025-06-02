@@ -5,15 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="78be801e-6813-467b-8fa0-4390f094cbe2" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/static/assets/js/camara.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Gym_Fitness/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/Gym_Fitness/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Perfil/migrations/0002_remove_usuario_fecha_nacimiento_and_more.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Perfil/migrations/0003_auto_20250526_1733.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Perfil/migrations/0004_remove_usuario_pais.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Gym_Fitness/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/Gym_Fitness/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Perfil/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/Perfil/forms.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Perfil/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/Perfil/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Perfil/templates/perfil/perfil.html" beforeDir="false" afterPath="$PROJECT_DIR$/Perfil/templates/perfil/perfil.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Perfil/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/Perfil/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/includes/navigation.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/includes/navigation.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -120,7 +121,10 @@
       <workItem from="1748527633651" duration="7959000" />
       <workItem from="1748647739095" duration="217000" />
       <workItem from="1748661182644" duration="6508000" />
-      <workItem from="1748667831640" duration="720000" />
+      <workItem from="1748667831640" duration="4862000" />
+      <workItem from="1748782273983" duration="1660000" />
+      <workItem from="1748892023250" duration="74000" />
+      <workItem from="1748894808081" duration="4493000" />
     </task>
     <servers />
   </component>

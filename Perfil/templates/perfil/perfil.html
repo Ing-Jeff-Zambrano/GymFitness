@@ -1,11 +1,12 @@
 {% extends 'layouts/base.html' %}
+{% load static %}
 
 {% block title %} Profile {% endblock title %}
 
 {% block content %}
 
 <div class="header pb-6 d-flex align-items-center"
-     style="min-height: 500px; background-image: url(/static/assets/img/theme/profile-cover.jpg); background-size: cover; background-position: center top;">
+     style="min-height: 500px; background-image: url({% static 'assets/img/theme/profile-cover.jpg' %}); background-size: cover; background-position: center top;">
   <span class="mask bg-gradient-default opacity-8"></span>
   <div class="container-fluid d-flex align-items-center">
     <div class="row">
@@ -13,7 +14,7 @@
         <h1 class="display-2 text-white">
           Bienvenido a tu Perfil {{ request.user.username|upper }}
         </h1>
-        <p class="text-white mt-0 mb-5">Esta es tu página de perfil. Puedes ver el progreso que has hecho con tu trabajo y administrar tus proyectos o tareas asignadas.</p>
+        <p class="text-white mt-0 mb-5">Esta es tu página de perfil.</p>
         <a href="#!" class="btn btn-neutral">Editar perfil</a>
       </div>
     </div>
@@ -23,24 +24,30 @@
   <div class="row">
     <div class="col-xl-4 order-xl-2">
       <div class="card card-profile">
-        <img src="/static/assets/img/theme/img-1-1000x600.jpg" alt="Image placeholder" class="card-img-top">
+        <img src="{% static 'assets/img/theme/img-1-1000x600.jpg' %}" alt="Image placeholder" class="card-img-top">
         <div class="row justify-content-center">
           <div class="col-lg-3 order-lg-2">
-            <div class="card-profile-image">
+            <div class="card-profile-image" style="display: flex; justify-content: center; align-items: center; width: 80px; height: 80px; overflow: hidden; border-radius: 50%; background-color: #f8f9fa;">
               <a href="#">
-                <img src="/static/assets/img/theme/team-4.jpg" class="rounded-circle">
+                {% if user.foto_perfil %}
+                  <img src="{{ user.foto_perfil.url }}" alt="Foto de Perfil" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                {% elif user.sexo == 'M' %}
+                  <i class="ni ni-single-02 text-black-50" style="font-size: 2.5rem;"></i>
+                {% elif user.sexo == 'F' %}
+                  <i class="ni ni-single-02 text-pink" style="font-size: 2.5rem;"></i>
+                {% else %}
+                  <i class="ni ni-circle-08 text-default" style="font-size: 2.5rem;"></i>
+                {% endif %}
               </a>
             </div>
           </div>
         </div>
         <div class="card-header text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4">
-
         </div>
         <div class="card-body pt-0">
           <div class="row">
             <div class="col">
               <div class="card-profile-stats d-flex justify-content-center">
-
               </div>
             </div>
           </div>
@@ -60,6 +67,12 @@
           <div>
       <i class="ni education_hat mr-2"></i> Teléfono: {{ request.user.telefono|default:"No especificado" }}
     </div>
+            <div class="h5 mt-4">
+              <i class="ni ni-chart-bar-32 mr-2"></i> Peso: {{ user.peso|default:"No especificado" }} kg
+            </div>
+            <div class="h5">
+              <i class="ni ni-ruler-pencil mr-2"></i> Estatura: {{ user.estatura|default:"No especificada" }} cm
+            </div>
           </div>
         </div>
       </div>
@@ -71,7 +84,6 @@
             <div class="col-8">
               <h3 class="mb-0">Editar perfil </h3>
             </div>
-
           </div>
         </div>
         <div class="card-body">
@@ -125,7 +137,6 @@
                     <label class="form-control-label" for="input-city">Ciudad</label>
                     <input type="text" id="input-city" class="form-control" placeholder="Ciudad" value="{{ user.ciudad|default:'' }}" name="ciudad">
                   </div>
-
                     <div class="form-group">
                       <label class="form-control-label" for="input-fecha-nacimiento">Fecha de Nacimiento</label>
                       <input type="date" id="input-fecha-nacimiento" class="form-control" placeholder="Fecha de Nacimiento" name="fecha_nacimiento" value="{{ user.fecha_nacimiento|date:'Y-m-d'|default:'' }}">
@@ -138,6 +149,14 @@
                         <option value="O"{% if user.sexo == 'O' %} selected {% endif %}>Otro</option>
                       </select>
                     </div>
+                    <div class="form-group">
+                      <label class="form-control-label" for="input-peso">Peso (kg)</label>
+                      <input type="number" id="input-peso" class="form-control" placeholder="Peso" name="peso" value="{{ user.peso|default:'' }}">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-control-label" for="input-estatura">Estatura (cm)</label>
+                      <input type="number" id="input-estatura" class="form-control" placeholder="Estatura" name="estatura" value="{{ user.estatura|default:'' }}">
+                    </div>
                 </div>
                 <div class="col-lg-4">
                   <div class="form-group">
@@ -145,10 +164,14 @@
                     <input type="text" id="input-country" class="form-control" placeholder="Pais" value="{{ user.pais|default:'' }}" name="pais">
                   </div>
                     <div class="form-group">
-                      <label class="form-control-label">Foto de Perfil</label>
-                      <button type="button" class="btn btn-primary">Tomar Foto de Perfil</button>
+                        <label class="form-control-label">Foto de Perfil</label>
+                        <div>
+                            <video id="camera-stream" width="320" height="240" autoplay style="display: none;"></video>
+                            <canvas id="camera-canvas" width="320" height="240" style="display: none;"></canvas>
+                            <button id="start-camera" type="button" class="btn btn-info mt-2">Iniciar Cámara</button>
+                            <button id="capture-photo" type="button" class="btn btn-success mt-2" style="display: none;">Capturar Foto</button>
+                        </div>
                     </div>
-
                 </div>
                 <div class="col-lg-4">
                   <div class="form-group">
@@ -176,11 +199,10 @@
       </div>
     </div>
   </div>
-
   {% include "includes/footer-fullscreen.html" %}
-
 </div>
-
 {% endblock content %}
 
-{% block javascripts %}{% endblock javascripts %}
+{% block javascripts %}
+<script src="{% static 'assets/js/camara.js' %}"></script>
+{% endblock javascripts %}

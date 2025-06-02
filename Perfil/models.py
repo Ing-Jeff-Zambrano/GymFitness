@@ -13,8 +13,11 @@ class Usuario(AbstractUser):
     )
     direccion = models.CharField(max_length=255, blank=True, null=True)
     telefono = models.CharField(max_length=20, blank=True, null=True)
-    ciudad = models.CharField(max_length=100, blank=True, null=True)  # Nuevo campo
-    pais = models.CharField(max_length=100, blank=True, null=True)    # Nuevo campo
+    ciudad = models.CharField(max_length=100, blank=True, null=True)
+    pais = models.CharField(max_length=100, blank=True, null=True)
+    foto_perfil = models.ImageField(upload_to='perfil_pics/', blank=True, null=True)
+    peso = models.FloatField(blank=True, null=True)  # Nuevo campo para el peso
+    estatura = models.FloatField(blank=True, null=True)
     groups = models.ManyToManyField(
         'auth.Group',
         verbose_name=('groups'),

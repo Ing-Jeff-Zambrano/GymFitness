@@ -69,11 +69,11 @@ class SignUpForm(UserCreationForm):
         ),
         label="Confirm Password"
     )
-    agree_terms = forms.BooleanField(label='I agree with the Privacy Policy') # Añadimos este campo
+    agree_terms = forms.BooleanField(label='I agree with the Privacy Policy')
 
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'last_name', 'email', 'agree_terms') # Incluimos el nuevo campo
+        fields = ('username', 'first_name', 'last_name', 'email', 'agree_terms')
 
     def clean_password2(self):
         password = self.cleaned_data.get("password")
@@ -90,3 +90,8 @@ class SignUpForm(UserCreationForm):
         if commit:
             user.save()
         return user
+
+class ProfilePictureForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('foto_perfil',)

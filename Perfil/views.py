@@ -1,13 +1,19 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.forms import AuthenticationForm, authenticate
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth import login
+from django.contrib.auth import logout
 from django.contrib import messages
 from .forms import SignUpForm, LoginForm
 from django.contrib.auth.decorators import login_required
+from datetime import datetime
+import json
+import base64
+from django.core.files.base import ContentFile
+from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import authenticate
+from django.contrib.auth import login
 from datetime import date, datetime
 
-
+User = get_user_model()
 
 def login_view(request):
     if request.method == 'POST':
@@ -20,10 +26,8 @@ def login_view(request):
                 login(request, user)
                 return redirect('dashboard')
             else:
-
                 return render(request, 'perfil/login.html', {'form': form, 'error': 'Invalid username or password'})
         else:
-
             return render(request, 'perfil/login.html', {'form': form, 'error': 'Invalid form'})
     else:
         form = AuthenticationForm()
@@ -50,25 +54,38 @@ def register(request):
 def dashboard(request):
     return render(request, 'perfil/dashboard.html')
 
-
-
 @login_required
-def logout(request):
+def logout_view(request):
     logout(request)
     return redirect('login')
 
 @login_required
 def perfil(request):
+    user = request.user
     if request.method == 'POST':
-        user = request.user
+        # Procesar la foto de perfil subida desde la cámara
+        camera_photo_data = request.POST.get('camera_photo_data')
+        if camera_photo_data:
+            try:
+                format, imgstr = camera_photo_data.split(';base64,')
+                ext = format.split('/')[-1]
+                image = ContentFile(base64.b64decode(imgstr), name='camera_photo.' + ext)
+                user.foto_perfil = image
+                messages.success(request, 'Foto de perfil actualizada desde la cámara.')
+            except Exception as e:
+                messages.error(request, f'Error al guardar la foto de la cámara: {e}')
+
+        # Procesar otros campos del perfil
         user.first_name = request.POST.get('first_name', user.first_name)
         user.last_name = request.POST.get('last_name', user.last_name)
         user.direccion = request.POST.get('direccion', user.direccion)
         user.telefono = request.POST.get('telefono', user.telefono)
         fecha_nacimiento_str = request.POST.get('fecha_nacimiento')
         sexo = request.POST.get('sexo')
-        user.ciudad = request.POST.get('ciudad', user.ciudad)  # Guardar ciudad
-        user.pais = request.POST.get('pais', user.pais)      # Guardar país
+        user.ciudad = request.POST.get('ciudad', user.ciudad)
+        user.pais = request.POST.get('pais', user.pais)
+        user.peso = request.POST.get('peso', user.peso)
+        user.estatura = request.POST.get('estatura', user.estatura)
 
         if fecha_nacimiento_str:
             try:
