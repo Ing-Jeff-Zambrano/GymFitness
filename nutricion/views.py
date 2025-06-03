@@ -1,5 +1,4 @@
-from django.http import HttpResponse
-
-def nutricion_view(request):
-    return HttpResponse("¡Estás en el módulo de Nutrición!, le corresponde a Patucho semicrack")
-
+from django.shortcuts import render
+from  django.contrib.auth.decorators import login_required
+def index(request):
+    return render(request, 'nutricion/index.html')

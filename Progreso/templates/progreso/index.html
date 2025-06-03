@@ -1,0 +1,30 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %} Progreso {% endblock title %}
+
+{% block stylesheets %}
+    {{ block.super }}
+    <style>
+      nav.navbar.navbar-top.navbar-dark.bg-primary.border-bottom {
+        background-color: black !important; /* O el color que prefieras */
+      }
+    </style>
+    <link rel="stylesheet" href="{% static 'assets/css/progreso.css' %}">
+{% endblock stylesheets %}
+
+{% block content %}
+    <div class="full-background">
+        <div class="content-wrapper">
+            <h1>Bienvenido a tu Progreso</h1>
+            <h1>{{ request.user.username|upper }}</h1>
+            <p>Aquí podrás ver tu avance y estadísticas.</p>
+            <p>¡Es hora de darle con todo a tu progreso!</p>
+            <a href="#" class="btn-empezar">Empezar</a>
+        </div>
+    </div>
+    {% include "includes/footer-fullscreen.html" %}
+{% endblock content %}
+
+{% block javascripts %}
+{% endblock javascripts %}
