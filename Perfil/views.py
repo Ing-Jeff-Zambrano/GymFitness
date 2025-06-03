@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from datetime import datetime
 import json
 import base64
-from django.core.files.base import ContentFile
+from django.core.files.base import ContentFile # <-- ¡Importa ContentFile!
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate
@@ -82,10 +82,38 @@ def logout_view(request):
 def perfil(request):
     ultima_medicion = MedicionCuerpo.objects.filter(usuario=request.user).order_by('-fecha_medicion').first()
     if request.method == 'POST':
-        form = UserProfileForm(request.POST, request.FILES, instance=request.user)
+        # --- NUEVO CÓDIGO PARA MANEJAR LA FOTO DE PERFIL BASE64 ---
+        # Crea una copia mutable de request.FILES para poder añadirle el archivo
+        files_data = request.FILES.copy()
+
+        camera_photo_data = request.POST.get('camera_photo_data')
+        if camera_photo_data:
+            try:
+                # La cadena Base64 viene con un prefijo 'data:image/png;base64,', hay que quitarlo
+                format, imgstr = camera_photo_data.split(';base64,')
+                ext = format.split('/')[-1] # Obtiene la extensión (ej. 'png')
+
+                # Decodifica la cadena Base64 a bytes
+                data = base64.b64decode(imgstr)
+
+                # Crea un objeto ContentFile que Django puede manejar como un archivo
+                # Le damos un nombre de archivo único para evitar colisiones
+                file_name = f"profile_pic_{request.user.username}_{datetime.now().strftime('%Y%m%d%H%M%S')}.{ext}"
+                files_data['foto_perfil'] = ContentFile(data, name=file_name)
+
+            except Exception as e:
+                print(f"Error al procesar la foto de la cámara (Base64): {e}")
+                messages.error(request, "Hubo un error al procesar la foto de la cámara.")
+
+        # --- FIN DEL NUEVO CÓDIGO ---
+
+        # Inicializa el formulario con request.POST y la copia modificada de request.FILES
+        form = UserProfileForm(request.POST, files_data, instance=request.user)
         if form.is_valid():
             user = form.save()
+            messages.success(request, "Perfil actualizado exitosamente.") # Mensaje de éxito
 
+            # --- Lógica de detección de tipo de cuerpo (ya la tenías) ---
             body_photos_data = []
             for i in range(1, 11):
                 image_data_url = request.POST.get(f'body_photo_{i}')
@@ -152,6 +180,8 @@ def perfil(request):
                 ultima_medicion = MedicionCuerpo.objects.filter(usuario=request.user).order_by('-fecha_medicion').first() # Recargar la última medición
 
             return redirect('perfil')
+        else:
+            messages.error(request, "Hubo un error al guardar el perfil. Por favor, revisa los datos.") # Mensaje de error si el formulario no es válido
     else:
         form = UserProfileForm(instance=request.user)
     return render(request, 'perfil/perfil.html', {'form': form, 'ultima_medicion': ultima_medicion})

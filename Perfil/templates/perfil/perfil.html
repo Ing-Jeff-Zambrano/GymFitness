@@ -98,7 +98,7 @@
           </div>
         </div>
         <div class="card-body">
-          <form method="post" action="{% url 'perfil' %}">
+          <form method="post" action="{% url 'perfil' %}" enctype="multipart/form-data">
             {% csrf_token %}
             <h6 class="heading-small text-muted mb-4">Información del usuario</h6>
             <div class="pl-lg-4">
