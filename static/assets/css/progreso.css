@@ -1,9 +1,10 @@
+/* Estilos existentes */
 .full-background {
     background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/static/assets/img/fondo.jpg');
-    background-size: 100% auto;
+    background-size: cover; /* Cambiado de 100% auto a cover para mejor adaptabilidad */
     background-repeat: no-repeat;
     background-position: center;
-    height: 80vh;
+    height: 80vh; /* Se mantiene para el banner inicial */
     color: #f8f9fa;
     display: flex;
     justify-content: center;
@@ -27,7 +28,7 @@
     margin-bottom: 20px;
 }
 
-.btn-empezar {
+.btn-empezar { /* Este botón ya no se usará directamente, pero se mantienen los estilos si lo reutilizas */
     display: inline-block;
     padding: 12px 24px;
     font-size: 1.3em;
@@ -44,6 +45,47 @@
     background-color: #e65100;
     transform: scale(1.05);
 }
+
 nav.navbar.navbar-top.navbar-dark.bg-primary.border-bottom {
   background-color: black !important; /* Gris oscuro */
+}
+
+/* --- Nuevos estilos para el dashboard de progreso --- */
+
+/* Ajuste para el header de Argon Dashboard */
+.header.pb-6 {
+    padding-bottom: 3rem !important; /* Ajusta el padding si es necesario */
+}
+
+/* Estilos para los gráficos */
+.chart-container {
+    position: relative;
+    height: 300px; /* Altura fija para los gráficos */
+    width: 100%;
+}
+
+/* Estilos para la tabla de mediciones */
+.table-responsive {
+    overflow-x: auto; /* Asegura que la tabla sea responsive */
+}
+
+/* Mejoras visuales para las tarjetas de stats */
+.card-stats .card-body {
+    padding: 1.5rem;
+}
+
+.card-stats .icon-shape {
+    font-size: 1.5rem;
+    width: 3.5rem;
+    height: 3.5rem;
+    line-height: 3.5rem;
+}
+
+.card-stats .card-title {
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+}
+
+.card-stats .h2 {
+    font-size: 1.8rem;
 }

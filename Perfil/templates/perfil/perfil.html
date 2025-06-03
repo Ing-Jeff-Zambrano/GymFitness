@@ -3,6 +3,25 @@
 
 {% block title %} Profile {% endblock title %}
 
+{% block stylesheets %}
+    {{ block.super }}
+    <style>
+      /* NUEVOS ESTILOS PARA OCULTAR LA BARRA DE NAVEGACIÓN SUPERIOR EN ESTA PÁGINA */
+      .main-content > nav.navbar {
+          display: none !important; /* Oculta la barra de navegación */
+      }
+      /* Ajusta el padding superior del contenido principal para que no quede un espacio vacío */
+      .main-content {
+          padding-top: 0 !important; /* Elimina el padding superior por defecto de Argon */
+      }
+      /* Si tu header principal de la página de perfil tiene un margen superior, ajústalo si es necesario */
+      .header.pb-6 {
+          padding-top: 0 !important; /* Asegura que el header empiece desde arriba si no hay navbar */
+          min-height: 500px; /* Mantener la altura mínima de tu banner */
+      }
+    </style>
+{% endblock stylesheets %}
+
 {% block content %}
 
 <div class="header pb-6 d-flex align-items-center"
@@ -68,10 +87,10 @@
       <i class="ni education_hat mr-2"></i> Teléfono: {{ request.user.telefono|default:"No especificado" }}
     </div>
             <div class="h5 mt-4">
-              <i class="ni ni-chart-bar-32 mr-2"></i> Peso: {{ user.peso|default:"No especificado" }} kg
+              <i class="ni ni-chart-bar-32 mr-2"></i> Peso: {% if ultima_medicion.peso %}{{ ultima_medicion.peso|floatformat:1 }} kg{% else %}No especificado{% endif %}
             </div>
             <div class="h5">
-              <i class="ni ni-ruler-pencil mr-2"></i> Estatura: {{ user.estatura|default:"No especificada" }} cm
+              <i class="ni ni-ruler-pencil mr-2"></i> Estatura: {% if ultima_medicion.estatura %}{{ ultima_medicion.estatura|floatformat:0 }} cm{% else %}No especificada{% endif %}
             </div>
           {% if ultima_medicion %}
             <div class="mt-4">
@@ -162,11 +181,13 @@
                     </div>
                     <div class="form-group">
                       <label class="form-control-label" for="input-peso">Peso (kg)</label>
-                      <input type="number" id="input-peso" class="form-control" placeholder="Peso" name="peso" value="{{ user.peso|default:'' }}">
+                      {# Ahora el valor se obtiene de la última medición, no del objeto user directamente #}
+                      <input type="number" id="input-peso" class="form-control" placeholder="Peso" name="peso" value="{% if ultima_medicion.peso %}{{ ultima_medicion.peso|floatformat:1 }}{% endif %}">
                     </div>
                     <div class="form-group">
                       <label class="form-control-label" for="input-estatura">Estatura (cm)</label>
-                      <input type="number" id="input-estatura" class="form-control" placeholder="Estatura" name="estatura" value="{{ user.estatura|default:'' }}">
+                      {# Ahora el valor se obtiene de la última medición, no del objeto user directamente #}
+                      <input type="number" id="input-estatura" class="form-control" placeholder="Estatura" name="estatura" value="{% if ultima_medicion.estatura %}{{ ultima_medicion.estatura|floatformat:0 }}{% endif %}">
                     </div>
                 </div>
                 <div class="col-lg-4">

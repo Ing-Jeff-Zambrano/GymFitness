@@ -1,5 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+# No necesitas importar get_user_model() aquí si Usuario es tu AUTH_USER_MODEL
+# from django.contrib.auth import get_user_model # <--- ELIMINA ESTA LÍNEA si existe
+
+# No necesitas esta línea si Usuario es tu AUTH_USER_MODEL y lo defines aquí
+# User = get_user_model() # <--- ELIMINA ESTA LÍNEA
 
 class Usuario(AbstractUser):
     fecha_nacimiento = models.DateField(null=True, blank=True)
@@ -16,8 +21,7 @@ class Usuario(AbstractUser):
     ciudad = models.CharField(max_length=100, blank=True, null=True)
     pais = models.CharField(max_length=100, blank=True, null=True)
     foto_perfil = models.ImageField(upload_to='perfil_pics/', blank=True, null=True)
-    peso = models.FloatField(blank=True, null=True)  # Nuevo campo para el peso
-    estatura = models.FloatField(blank=True, null=True)
+    # Eliminamos peso y estatura de aquí, ya que se movieron a MedicionCuerpo
     groups = models.ManyToManyField(
         'auth.Group',
         verbose_name=('groups'),
@@ -42,6 +46,8 @@ class Usuario(AbstractUser):
         return self.username
 
 class MedicionCuerpo(models.Model):
+    # Aquí, como Usuario ya está definido en este mismo archivo,
+    # puedes referenciarlo directamente como Usuario, no necesitas get_user_model()
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='mediciones_cuerpo')
     fecha_medicion = models.DateTimeField(auto_now_add=True)
     ancho_hombros = models.FloatField(blank=True, null=True)
@@ -49,6 +55,8 @@ class MedicionCuerpo(models.Model):
     icc_estimado = models.FloatField(blank=True, null=True)
     relacion_hombro_cintura = models.FloatField(blank=True, null=True)
     tipo_cuerpo = models.CharField(max_length=50, blank=True, null=True)
+    peso = models.FloatField(blank=True, null=True)
+    estatura = models.FloatField(blank=True, null=True)
 
     def __str__(self):
         return f"Medición de {self.usuario.username} el {self.fecha_medicion.strftime('%Y-%m-%d %H:%M:%S')}"

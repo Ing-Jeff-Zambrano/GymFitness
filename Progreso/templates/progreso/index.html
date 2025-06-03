@@ -6,25 +6,362 @@
 {% block stylesheets %}
     {{ block.super }}
     <style>
-      nav.navbar.navbar-top.navbar-dark.bg-primary.border-bottom {
-        background-color: black !important; /* O el color que prefieras */
+      /* La regla de fondo negro que tenías en el <style> se puede eliminar o comentar si la barra se va a ocultar */
+      /* nav.navbar.navbar-top.navbar-dark.bg-primary.border-bottom {
+        background-color: black !important;
+      } */
+
+      /* NUEVOS ESTILOS PARA OCULTAR LA BARRA DE NAVEGACIÓN SUPERIOR EN ESTA PÁGINA */
+      .main-content > nav.navbar {
+          display: none !important; /* Oculta la barra de navegación */
+      }
+      /* Ajusta el padding superior del contenido principal para que no quede un espacio vacío */
+      .main-content {
+          padding-top: 0 !important; /* Elimina el padding superior por defecto de Argon */
+      }
+      /* Si tu header principal de la página de progreso tiene un margen superior, ajústalo si es necesario */
+      .header.pb-6 {
+          padding-top: 0 !important; /* Asegura que el header empiece desde arriba si no hay navbar */
+          min-height: 400px; /* Mantener la altura mínima de tu banner */
       }
     </style>
     <link rel="stylesheet" href="{% static 'assets/css/progreso.css' %}">
 {% endblock stylesheets %}
 
 {% block content %}
-    <div class="full-background">
-        <div class="content-wrapper">
-            <h1>Bienvenido a tu Progreso</h1>
-            <h1>{{ request.user.username|upper }}</h1>
-            <p>Aquí podrás ver tu avance y estadísticas.</p>
-            <p>¡Es hora de darle con todo a tu progreso!</p>
-            <a href="#" class="btn-empezar">Empezar</a>
+    <div class="header pb-6 d-flex align-items-center"
+         style="min-height: 400px; background-image: url({% static 'assets/img/theme/profile-cover.jpg' %}); background-size: cover; background-position: center top;">
+        <span class="mask bg-gradient-default opacity-8"></span>
+        <div class="container-fluid d-flex align-items-center">
+            <div class="row">
+                <div class="col-lg-7 col-md-10">
+                    <h1 class="display-2 text-white">
+                        Bienvenido a tu Progreso, {{ request.user.first_name|upper }}!
+                    </h1>
+                    <p class="text-white mt-0 mb-5">
+                        Aquí podrás ver tu avance, estadísticas y la evolución de tus métricas.
+                        ¡Es hora de darlo todo y alcanzar tus metas!
+                    </p>
+                    <a href="{% url 'perfil' %}" class="btn btn-neutral">Registrar Nueva Medición</a>
+                </div>
+            </div>
         </div>
     </div>
-    {% include "includes/footer-fullscreen.html" %}
+
+    <div class="container-fluid mt--6">
+        <div class="row">
+            <!-- Tarjetas de Métricas Clave -->
+            <div class="col-xl-3 col-md-6">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <h5 class="card-title text-uppercase text-muted mb-0">Último Peso</h5>
+                                <span class="h2 font-weight-bold mb-0">
+                                    {% if ultima_medicion.peso %}{{ ultima_medicion.peso|floatformat:1 }} kg{% else %}N/A{% endif %}
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-red text-white rounded-circle shadow">
+                                    <i class="fas fa-weight"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="mt-3 mb-0 text-muted text-sm">
+                            <span class="text-nowrap">
+                                {% if ultima_medicion.fecha_medicion %}
+                                    Última: {{ ultima_medicion.fecha_medicion|date:"d M Y" }}
+                                {% else %}
+                                    Sin registro
+                                {% endif %}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <h5 class="card-title text-uppercase text-muted mb-0">IMC Actual</h5>
+                                <span class="h2 font-weight-bold mb-0">
+                                    {% if imc_ultima_medicion is not None %}
+                                        {{ imc_ultima_medicion|floatformat:1 }}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-orange text-white rounded-circle shadow">
+                                    <i class="fas fa-calculator"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="mt-3 mb-0 text-muted text-sm">
+                            <span class="text-nowrap">
+                                {% if ultima_medicion.peso and ultima_medicion.estatura %}
+                                    (Peso/Estatura²)
+                                {% else %}
+                                    Datos incompletos
+                                {% endif %}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <h5 class="card-title text-uppercase text-muted mb-0">Tipo de Cuerpo</h5>
+                                <span class="h2 font-weight-bold mb-0">
+                                    {% if ultima_medicion.tipo_cuerpo %}{{ ultima_medicion.tipo_cuerpo }}{% else %}No determinado{% endif %}
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-green text-white rounded-circle shadow">
+                                    <i class="fas fa-male"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="mt-3 mb-0 text-muted text-sm">
+                            <span class="text-nowrap">
+                                {% if ultima_medicion.tipo_cuerpo %}
+                                    Según última medición
+                                {% else %}
+                                    Realiza una medición
+                                {% endif %}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <h5 class="card-title text-uppercase text-muted mb-0">Mediciones Totales</h5>
+                                <span class="h2 font-weight-bold mb-0">{{ mediciones_recientes|length }}</span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-info text-white rounded-circle shadow">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="mt-3 mb-0 text-muted text-sm">
+                            <span class="text-nowrap">Registros en tu historial</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Gráfico de Peso -->
+            <div class="col-xl-6">
+                <div class="card">
+                    <div class="card-header bg-transparent">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h6 class="text-uppercase text-muted ls-1 mb-1">Tu Evolución</h6>
+                                <h5 class="h3 mb-0">Progreso de Peso (kg)</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart">
+                            <canvas id="weight-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Gráfico de IMC -->
+            <div class="col-xl-6">
+                <div class="card">
+                    <div class="card-header bg-transparent">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h6 class="text-uppercase text-muted ls-1 mb-1">Tu Salud</h6>
+                                <h5 class="h3 mb-0">Evolución del IMC</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart">
+                            <canvas id="imc-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de Mediciones Recientes -->
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header border-0">
+                        <h3 class="mb-0">Últimas Mediciones</h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table align-items-center table-flush">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th scope="col">Fecha</th>
+                                    <th scope="col">Peso (kg)</th>
+                                    <th scope="col">Estatura (cm)</th>
+                                    <th scope="col">IMC</th>
+                                    <th scope="col">Tipo de Cuerpo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for medicion in mediciones_recientes %}
+                                <tr>
+                                    <td>{{ medicion.fecha_medicion|date:"d M Y" }}</td>
+                                    <td>{{ medicion.peso|floatformat:1 }}</td>
+                                    <td>{{ medicion.estatura|floatformat:0 }}</td>
+                                    <td>
+                                        {% if medicion.imc_valor is not None %}
+                                            {{ medicion.imc_valor|floatformat:1 }}
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ medicion.tipo_cuerpo }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center">No hay mediciones registradas aún.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% include "includes/footer-fullscreen.html" %}
+    </div>
 {% endblock content %}
 
 {% block javascripts %}
+    {{ block.super }}
+    <!-- Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+    <script>
+        // Datos pasados desde Django
+        const fechas = JSON.parse('{{ fechas_json|safe }}');
+        const pesos = JSON.parse('{{ pesos_json|safe }}');
+        const imcs = JSON.parse('{{ imcs_json|safe }}');
+
+        // Gráfico de Peso
+        var weightCtx = document.getElementById('weight-chart').getContext('2d');
+        var weightChart = new Chart(weightCtx, {
+            type: 'line',
+            data: {
+                labels: fechas,
+                datasets: [{
+                    label: 'Peso (kg)',
+                    data: pesos,
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 2,
+                    pointBackgroundColor: 'rgba(255, 99, 132, 1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(255, 99, 132, 1)',
+                    fill: false,
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: false,
+                            callback: function(value) {
+                                return value + ' kg';
+                            }
+                        }
+                    }],
+                    xAxes: [{
+                        type: 'time',
+                        time: {
+                            unit: 'day',
+                            displayFormats: {
+                                day: 'MMM D'
+                            }
+                        },
+                        distribution: 'linear'
+                    }]
+                },
+                legend: {
+                    display: false
+                },
+                tooltips: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                hover: {
+                    mode: 'nearest',
+                    intersect: true
+                }
+            }
+        });
+
+        // Gráfico de IMC
+        var imcCtx = document.getElementById('imc-chart').getContext('2d');
+        var imcChart = new Chart(imcCtx, {
+            type: 'line',
+            data: {
+                labels: fechas,
+                datasets: [{
+                    label: 'IMC',
+                    data: imcs,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 2,
+                    pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(54, 162, 235, 1)',
+                    fill: false,
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: false
+                        }
+                    }],
+                    xAxes: [{
+                        type: 'time',
+                        time: {
+                            unit: 'day',
+                            displayFormats: {
+                                day: 'MMM D'
+                            }
+                        },
+                        distribution: 'linear'
+                    }]
+                },
+                legend: {
+                    display: false
+                },
+                tooltips: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                hover: {
+                    mode: 'nearest',
+                    intersect: true
+                }
+            }
+        });
+    </script>
 {% endblock javascripts %}

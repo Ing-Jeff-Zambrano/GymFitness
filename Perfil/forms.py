@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
+from .models import MedicionCuerpo # Importa MedicionCuerpo
 
 User = get_user_model()
 
@@ -42,8 +43,15 @@ class ProfilePictureForm(forms.ModelForm):
         model = User
         fields = ('foto_perfil',)
 
-# Añade esta clase:
+# ESTA ES LA CLASE CLAVE QUE DEBES VERIFICAR
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'direccion', 'ciudad', 'pais', 'telefono', 'fecha_nacimiento', 'sexo', 'foto_perfil', 'peso', 'estatura']
+        # ASEGÚRATE DE QUE 'peso' Y 'estatura' NO ESTÉN EN ESTA LISTA
+        fields = ['first_name', 'last_name', 'direccion', 'ciudad', 'pais', 'telefono', 'fecha_nacimiento', 'sexo', 'foto_perfil']
+
+# Este formulario es para MedicionCuerpo, y está bien que tenga peso y estatura
+class MedicionCuerpoForm(forms.ModelForm):
+    class Meta:
+        model = MedicionCuerpo
+        fields = ['peso', 'estatura', 'ancho_hombros', 'ancho_caderas', 'icc_estimado', 'relacion_hombro_cintura', 'tipo_cuerpo']
