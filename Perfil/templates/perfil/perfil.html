@@ -6,18 +6,16 @@
 {% block stylesheets %}
     {{ block.super }}
     <style>
-      /* NUEVOS ESTILOS PARA OCULTAR LA BARRA DE NAVEGACIÓN SUPERIOR EN ESTA PÁGINA */
+      /* Estilos para ocultar la barra de navegación superior en esta página */
       .main-content > nav.navbar {
-          display: none !important; /* Oculta la barra de navegación */
+          display: none !important;
       }
-      /* Ajusta el padding superior del contenido principal para que no quede un espacio vacío */
       .main-content {
-          padding-top: 0 !important; /* Elimina el padding superior por defecto de Argon */
+          padding-top: 0 !important;
       }
-      /* Si tu header principal de la página de perfil tiene un margen superior, ajústalo si es necesario */
       .header.pb-6 {
-          padding-top: 0 !important; /* Asegura que el header empiece desde arriba si no hay navbar */
-          min-height: 500px; /* Mantener la altura mínima de tu banner */
+          padding-top: 0 !important;
+          min-height: 500px; /* Mantener la altura mínima del banner del perfil */
       }
     </style>
 {% endblock stylesheets %}
@@ -30,16 +28,20 @@
   <div class="container-fluid d-flex align-items-center">
     <div class="row">
       <div class="col-lg-7 col-md-10">
+        {# Contenido de la cabecera similar al de Progreso #}
         <h1 class="display-2 text-white">
-          Bienvenido a tu Perfil {{ request.user.username|upper }}
+          Bienvenido a tu Perfil, {{ request.user.first_name|upper }}!
         </h1>
-        <p class="text-white mt-0 mb-5">Esta es tu página de perfil.</p>
-        <a href="#!" class="btn btn-neutral">Editar perfil</a>
+        <p class="text-white mt-0 mb-4">
+          Aquí puedes gestionar tu información personal y tus mediciones.
+          ¡Mantén tus datos actualizados para un seguimiento preciso!
+        </p>
+        <a href="#edit-profile-form" class="btn btn-neutral">Editar Perfil</a> {# Botón de acción para el perfil #}
       </div>
     </div>
   </div>
 </div>
-<div class="container-fluid mt--6">
+<div class="container-fluid mt--8"> {# Mantener mt--6 para alineación #}
   <div class="row">
     <div class="col-xl-4 order-xl-2">
       <div class="card card-profile">
@@ -61,7 +63,7 @@
             </div>
           </div>
         </div>
-        <div class="card-header text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4">
+        <div class="card-header text-center border-1 pt-7 pt-md-4 pb-0 pb-md-0">
         </div>
         <div class="card-body pt-0">
           <div class="row">
@@ -117,7 +119,7 @@
           </div>
         </div>
         <div class="card-body">
-          <form method="post" action="{% url 'perfil' %}" enctype="multipart/form-data">
+          <form method="post" action="{% url 'perfil' %}" enctype="multipart/form-data" id="edit-profile-form">
             {% csrf_token %}
             <h6 class="heading-small text-muted mb-4">Información del usuario</h6>
             <div class="pl-lg-4">
@@ -202,6 +204,12 @@
                             <canvas id="camera-canvas" width="320" height="240" style="display: none;"></canvas>
                             <button id="start-camera" type="button" class="btn btn-info mt-2">Iniciar Cámara</button>
                             <button id="capture-photo" type="button" class="btn btn-success mt-2" style="display: none;">Capturar Foto</button>
+                            {# NUEVOS BOTONES AÑADIDOS AQUÍ #}
+                            <button id="recapture-photo" type="button" class="btn btn-warning mt-2" style="display: none;">Volver a Capturar</button>
+                            <button id="save-photo" type="button" class="btn btn-primary mt-2" style="display: none;">Guardar Foto</button>
+                            <button id="cancel-photo" type="button" class="btn btn-danger mt-2" style="display: none;">Cancelar</button>
+                            {# Campo oculto para almacenar la imagen capturada en base64 #}
+                            <input type="hidden" id="camera-photo-data" name="camera_photo_data">
                         </div>
                     </div>
                 </div>

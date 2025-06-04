@@ -1,113 +1,153 @@
-const cameraStream = document.getElementById('camera-stream');
-  const cameraCanvas = document.getElementById('camera-canvas');
-  const startCameraButton = document.getElementById('start-camera');
-  const capturePhotoButton = document.getElementById('capture-photo');
-  const detectBodyTypeButton = document.getElementById('detect-body-type');
-  const uploadFile = document.getElementById('upload-file');
-  const context = cameraCanvas.getContext('2d');
-  let stream;
-  let capturedImagesForBodyType = [];
-  const numberOfCaptures = 10;
-  let captureCounter = 0;
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM completamente cargado. Inicializando script de cámara.');
 
-  startCameraButton.addEventListener('click', async () => {
-    try {
-      stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-      cameraStream.srcObject = stream;
-      cameraStream.style.display = 'block';
-      capturePhotoButton.style.display = 'inline-block';
-      startCameraButton.style.display = 'none';
-      detectBodyTypeButton.style.display = 'none'; // Ocultar detección al usar captura de foto de perfil
-    } catch (err) {
-      console.error("Error accessing camera: ", err);
-      alert("No se pudo acceder a la cámara.");
+    // Obtener referencias a los elementos HTML por su ID
+    const startCameraButton = document.getElementById('start-camera');
+    const capturePhotoButton = document.getElementById('capture-photo');
+    const recapturePhotoButton = document.getElementById('recapture-photo'); // Botón "Volver a Capturar"
+    const savePhotoButton = document.getElementById('save-photo');         // Botón "Guardar Foto"
+    const cancelPhotoButton = document.getElementById('cancel-photo');     // Botón "Cancelar"
+    const cameraStream = document.getElementById('camera-stream');         // Elemento <video> para la transmisión de la cámara
+    const cameraCanvas = document.getElementById('camera-canvas');         // Elemento <canvas> para la captura de la foto
+    const cameraPhotoDataInput = document.getElementById('camera-photo-data'); // Campo oculto para almacenar la imagen en base64
+    const context = cameraCanvas.getContext('2d'); // Contexto 2D del canvas para dibujar la imagen
+
+    // Verificar si todos los elementos se encontraron correctamente en el DOM
+    // Si alguno de estos es 'null', significa que el ID en el HTML no coincide o el elemento no existe.
+    console.log('Elementos HTML encontrados:');
+    console.log('startCameraButton:', startCameraButton);
+    console.log('capturePhotoButton:', capturePhotoButton);
+    console.log('recapturePhotoButton:', recapturePhotoButton);
+    console.log('savePhotoButton:', savePhotoButton);
+    console.log('cancelPhotoButton:', cancelPhotoButton);
+    console.log('cameraStream:', cameraStream);
+    console.log('cameraCanvas:', cameraCanvas);
+    console.log('cameraPhotoDataInput:', cameraPhotoDataInput);
+
+
+    let stream; // Variable para almacenar el MediaStream de la cámara
+
+    // Función auxiliar para controlar la visibilidad de los elementos
+    function setVisibility(element, isVisible) {
+        if (element) { // Asegurarse de que el elemento exista antes de intentar modificar su estilo
+            element.style.display = isVisible ? 'block' : 'none';
+            console.log(`Visibilidad de ${element.id} establecida a: ${isVisible ? 'visible' : 'oculto'}`);
+        } else {
+            console.warn(`Intento de establecer visibilidad en un elemento nulo (ID no encontrado).`);
+        }
     }
-  });
 
-  capturePhotoButton.addEventListener('click', () => {
-    context.drawImage(cameraStream, 0, 0, cameraCanvas.width, cameraCanvas.height);
-    const imageDataURL = cameraCanvas.toDataURL('image/png');
+    // --- Configuración inicial de la visibilidad de los botones al cargar la página ---
+    setVisibility(recapturePhotoButton, false); // Ocultar "Volver a Capturar"
+    setVisibility(savePhotoButton, false);     // Ocultar "Guardar Foto"
+    setVisibility(cancelPhotoButton, false);    // Ocultar "Cancelar"
+    setVisibility(capturePhotoButton, false);   // Ocultar "Capturar Foto" (solo se muestra al iniciar cámara)
 
-    const cameraPhotoInput = document.createElement('input');
-    cameraPhotoInput.setAttribute('type', 'hidden');
-    cameraPhotoInput.setAttribute('name', 'camera_photo_data');
-    cameraPhotoInput.setAttribute('value', imageDataURL);
+    // --- Event Listener para el botón "Iniciar Cámara" ---
+    startCameraButton.addEventListener('click', async function() {
+        console.log('Botón "Iniciar Cámara" clickeado.');
+        try {
+            // Solicitar acceso a la cámara de video del usuario
+            stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            cameraStream.srcObject = stream; // Asignar el stream al elemento <video>
 
-    const profileForm = document.querySelector('form');
-    profileForm.appendChild(cameraPhotoInput);
+            // Actualizar la visibilidad de los elementos
+            setVisibility(cameraStream, true);      // Mostrar la transmisión de la cámara
+            setVisibility(cameraCanvas, false);     // Asegurarse de que el canvas esté oculto
+            setVisibility(startCameraButton, false); // Ocultar "Iniciar Cámara"
+            setVisibility(capturePhotoButton, true); // Mostrar "Capturar Foto"
+            setVisibility(recapturePhotoButton, false); // Asegurarse de que esté oculto
+            setVisibility(savePhotoButton, false);      // Asegurarse de que esté oculto
+            setVisibility(cancelPhotoButton, true);     // Mostrar "Cancelar"
+            console.log('Cámara iniciada exitosamente.');
+        } catch (err) {
+            console.error("Error al acceder a la cámara: ", err);
+            alert("No se pudo acceder a la cámara. Asegúrate de que esté disponible y de que hayas dado permiso.");
+        }
+    });
 
-    cameraStream.style.display = 'none';
-    capturePhotoButton.style.display = 'none';
-    startCameraButton.style.display = 'block';
-    detectBodyTypeButton.style.display = 'block'; // Mostrar detección de nuevo
-    alert('Foto de perfil capturada. Ahora puedes guardar tu perfil.');
-  });
+    // --- Event Listener para el botón "Capturar Foto" ---
+    capturePhotoButton.addEventListener('click', function() {
+        console.log('Botón "Capturar Foto" clickeado.');
+        // Configurar el tamaño del canvas para que coincida con la resolución del video
+        cameraCanvas.width = cameraStream.videoWidth;
+        cameraCanvas.height = cameraStream.videoHeight;
 
-  detectBodyTypeButton.addEventListener('click', async () => {
-    capturedImagesForBodyType = [];
-    captureCounter = 0;
-    try {
-      stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-      cameraStream.srcObject = stream;
-      cameraStream.style.display = 'block';
-      startCameraButton.style.display = 'none';
-      capturePhotoButton.style.display = 'none';
-      detectBodyTypeButton.style.display = 'none';
-      alert(`Iniciando captura de ${numberOfCaptures} fotos para detección de tipo de cuerpo...`);
-
-      const captureInterval = setInterval(() => {
+        // Dibujar el frame actual del video en el canvas
         context.drawImage(cameraStream, 0, 0, cameraCanvas.width, cameraCanvas.height);
+        // Obtener la imagen del canvas en formato Data URL (Base64)
         const imageDataURL = cameraCanvas.toDataURL('image/png');
-        capturedImagesForBodyType.push(imageDataURL);
-        captureCounter++;
-        console.log(`Foto ${captureCounter} para tipo de cuerpo capturada.`);
+        cameraPhotoDataInput.value = imageDataURL; // Guardar la imagen en el campo oculto del formulario
+        console.log('Imagen capturada y guardada en campo oculto.');
 
-        if (captureCounter >= numberOfCaptures) {
-          clearInterval(captureInterval);
-          cameraStream.style.display = 'none';
-          alert(`${numberOfCaptures} fotos capturadas para análisis de tipo de cuerpo. Ahora puedes guardar tu perfil.`);
-          startCameraButton.style.display = 'block';
-          detectBodyTypeButton.style.display = 'block';
-
-          // Añadir campos ocultos al formulario con las imageDataURL
-          const profileForm = document.querySelector('form');
-          capturedImagesForBodyType.forEach((imageData, index) => {
-            const input = document.createElement('input');
-            input.setAttribute('type', 'hidden');
-            input.setAttribute('name', `body_photo_${index + 1}`);
-            input.setAttribute('value', imageData);
-            profileForm.appendChild(input);
-          });
-          capturedImagesForBodyType = []; // Limpiar el array después de añadir al formulario
+        // Detener el stream de la cámara para liberar los recursos
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            console.log('Stream de cámara detenido.');
         }
-      }, 1000); // Captura cada 1 segundo
 
-    } catch (err) {
-      console.error("Error accessing camera: ", err);
-      alert("No se pudo acceder a la cámara para la detección de tipo de cuerpo.");
-      startCameraButton.style.display = 'block';
-      detectBodyTypeButton.style.display = 'block';
-    }
-  });
+        // Actualizar la visibilidad de los elementos
+        setVisibility(cameraStream, false);      // Ocultar la transmisión de la cámara
+        setVisibility(cameraCanvas, true);       // Mostrar la imagen capturada en el canvas
+        setVisibility(capturePhotoButton, false); // Ocultar "Capturar Foto"
+        setVisibility(recapturePhotoButton, true); // Mostrar "Volver a Capturar"
+        setVisibility(savePhotoButton, true);     // Mostrar "Guardar Foto"
+        setVisibility(cancelPhotoButton, true);    // Mostrar "Cancelar"
+        console.log('Visibilidad de botones actualizada después de capturar.');
+    });
 
-  function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-      const cookies = document.cookie.split(';');
-      for (let i = 0; i < cookies.length; i++) {
-        let cookie = cookies[i].trim();
-        if (cookie.substring(0, name.length + 1) === (name + '=')) {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-          break;
+    // --- Event Listener para el botón "Volver a Capturar" ---
+    recapturePhotoButton.addEventListener('click', async function() {
+        console.log('Botón "Volver a Capturar" clickeado.');
+        // Limpiar el canvas y el campo oculto
+        context.clearRect(0, 0, cameraCanvas.width, cameraCanvas.height);
+        cameraPhotoDataInput.value = '';
+
+        // Reiniciar el stream de la cámara
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            cameraStream.srcObject = stream;
+            setVisibility(cameraStream, true);      // Mostrar la transmisión de la cámara
+            setVisibility(cameraCanvas, false);     // Ocultar el canvas
+            setVisibility(recapturePhotoButton, false); // Ocultar "Volver a Capturar"
+            setVisibility(savePhotoButton, false);      // Ocultar "Guardar Foto"
+            setVisibility(capturePhotoButton, true);    // Mostrar "Capturar Foto"
+            setVisibility(cancelPhotoButton, true);     // Mostrar "Cancelar"
+            console.log('Cámara reiniciada.');
+        } catch (err) {
+            console.error("Error al reiniciar la cámara: ", err);
+            alert("No se pudo reiniciar la cámara.");
         }
-      }
-    }
-    return cookieValue;
-  }
+    });
 
-  uploadFile.addEventListener('change', function() {
-    const file = this.files[0];
-    if (file) {
-      console.log("Archivo seleccionado:", file);
-    }
-  });
+    // --- Event Listener para el botón "Guardar Foto" ---
+    savePhotoButton.addEventListener('click', function() {
+        console.log('Botón "Guardar Foto" clickeado.');
+        // Este botón solo confirma que la foto está lista en el campo oculto.
+        // El guardado real en el servidor ocurre cuando el formulario principal se envía.
+        alert("Foto lista para guardar. Envía el formulario principal (botón 'Guardar Perfil') para aplicar los cambios.");
+    });
+
+    // --- Event Listener para el botón "Cancelar" ---
+    cancelPhotoButton.addEventListener('click', function() {
+        console.log('Botón "Cancelar" clickeado.');
+        // Detener el stream de la cámara si está activo
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+        }
+        // Limpiar el canvas y el campo oculto
+        context.clearRect(0, 0, cameraCanvas.width, cameraCanvas.height);
+        cameraPhotoDataInput.value = '';
+
+        // Ocultar todos los elementos de la cámara y mostrar solo el botón "Iniciar Cámara"
+        setVisibility(cameraStream, false);
+        setVisibility(cameraCanvas, false);
+        setVisibility(startCameraButton, true);
+        setVisibility(capturePhotoButton, false);
+        setVisibility(recapturePhotoButton, false);
+        setVisibility(savePhotoButton, false);
+        setVisibility(cancelPhotoButton, false);
+        console.log('Proceso de cámara cancelado.');
+    });
+});
+
