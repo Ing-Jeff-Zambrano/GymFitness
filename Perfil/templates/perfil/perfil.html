@@ -17,18 +17,50 @@
           padding-top: 0 !important;
           min-height: 500px; /* Mantener la altura mínima del banner del perfil */
       }
+      /* Asegurarse de que el video y el canvas se superpongan correctamente */
+      #camera-container {
+          position: relative;
+          width: 320px; /* Ancho fijo para el contenedor */
+          height: 240px; /* Alto fijo para el contenedor */
+          overflow: hidden; /* Ocultar cualquier desbordamiento */
+          border-radius: 0.5rem; /* Bordes redondeados */
+          background-color: #f0f0f0; /* Fondo para cuando no hay video */
+      }
+      #camera-stream, #camera-canvas {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover; /* Asegura que el video/imagen cubra el área */
+          transform: scaleX(-1); /* Voltear horizontalmente para efecto espejo */
+      }
+      /* Estilos para el mensaje de progreso de la cámara */
+      #camera-message {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background-color: rgba(0, 0, 0, 0.7);
+          color: white;
+          padding: 10px 20px;
+          border-radius: 5px;
+          font-size: 1.1em;
+          text-align: center;
+          display: none; /* Oculto por defecto */
+          z-index: 10; /* Asegurarse de que esté por encima del video/canvas */
+      }
     </style>
 {% endblock stylesheets %}
 
 {% block content %}
 
-<div class="header pb-6 d-flex align-items-center"
+<div class="header pb-6 d-flex align-items-start"
      style="min-height: 500px; background-image: url({% static 'assets/img/theme/profile-cover.jpg' %}); background-size: cover; background-position: center top;">
   <span class="mask bg-gradient-default opacity-8"></span>
-  <div class="container-fluid d-flex align-items-center">
+  <div class="container-fluid d-flex align-items-start">
     <div class="row">
       <div class="col-lg-7 col-md-10">
-        {# Contenido de la cabecera similar al de Progreso #}
         <h1 class="display-2 text-white">
           Bienvenido a tu Perfil, {{ request.user.first_name|upper }}!
         </h1>
@@ -36,12 +68,12 @@
           Aquí puedes gestionar tu información personal y tus mediciones.
           ¡Mantén tus datos actualizados para un seguimiento preciso!
         </p>
-        <a href="#edit-profile-form" class="btn btn-neutral">Editar Perfil</a> {# Botón de acción para el perfil #}
+        <a href="#edit-profile-form" class="btn btn-neutral">Editar Perfil</a>
       </div>
     </div>
   </div>
 </div>
-<div class="container-fluid mt--8"> {# Mantener mt--6 para alineación #}
+<div class="container-fluid mt--9">
   <div class="row">
     <div class="col-xl-4 order-xl-2">
       <div class="card card-profile">
@@ -199,18 +231,17 @@
                   </div>
                     <div class="form-group">
                         <label class="form-control-label">Foto de Perfil</label>
-                        <div>
-                            <video id="camera-stream" width="320" height="240" autoplay style="display: none;"></video>
-                            <canvas id="camera-canvas" width="320" height="240" style="display: none;"></canvas>
-                            <button id="start-camera" type="button" class="btn btn-info mt-2">Iniciar Cámara</button>
-                            <button id="capture-photo" type="button" class="btn btn-success mt-2" style="display: none;">Capturar Foto</button>
-                            {# NUEVOS BOTONES AÑADIDOS AQUÍ #}
-                            <button id="recapture-photo" type="button" class="btn btn-warning mt-2" style="display: none;">Volver a Capturar</button>
-                            <button id="save-photo" type="button" class="btn btn-primary mt-2" style="display: none;">Guardar Foto</button>
-                            <button id="cancel-photo" type="button" class="btn btn-danger mt-2" style="display: none;">Cancelar</button>
-                            {# Campo oculto para almacenar la imagen capturada en base64 #}
-                            <input type="hidden" id="camera-photo-data" name="camera_photo_data">
+                        <div id="camera-container">
+                            <video id="camera-stream" autoplay style="display: none;"></video>
+                            <canvas id="camera-canvas" style="display: none;"></canvas>
+                            <div id="camera-message" style="display: none;"></div> {# Mensaje para la detección de cuerpo #}
                         </div>
+                        <button id="start-camera" type="button" class="btn btn-info mt-2">Iniciar Cámara</button>
+                        <button id="capture-photo" type="button" class="btn btn-success mt-2" style="display: none;">Capturar Foto</button>
+                        <button id="recapture-photo" type="button" class="btn btn-warning mt-2" style="display: none;">Volver a Capturar</button>
+                        <button id="save-photo" type="button" class="btn btn-primary mt-2" style="display: none;">Guardar Foto</button>
+                        <button id="cancel-photo" type="button" class="btn btn-danger mt-2" style="display: none;">Cancelar</button>
+                        <input type="hidden" id="camera-photo-data" name="camera_photo_data">
                     </div>
                 </div>
                 <div class="col-lg-4">
@@ -221,12 +252,31 @@
                     <div class="form-group">
                       <label class="form-control-label">Detectar Tipo de Cuerpo</label>
                       <button id="detect-body-type" type="button" class="btn btn-info">Iniciar Detección de Tipo de Cuerpo</button>
-                      <p class="mt-2">Al hacer clic aquí, se iniciará el proceso para tomar varias fotos y estimar tu tipo de cuerpo.</p>
+                      {# Nuevo botón para iniciar la captura de fotos #}
+                      <button id="start-body-capture" type="button" class="btn btn-success mt-2" style="display: none;">Iniciar Captura de Medición</button>
+                      <p class="mt-2">Al hacer clic en "Iniciar Detección de Tipo de Cuerpo", verás tu imagen con puntos de referencia. Cuando estés listo, haz clic en "Iniciar Captura de Medición" para tomar las fotos.</p>
+                      {# Campo oculto para las fotos de medición #}
+                      <input type="hidden" id="measurement-photo-data" name="measurement_photo_data">
                       </div>
                 </div>
               </div>
             </div>
             <hr class="my-4" />
+            {# NUEVA SECCIÓN PARA MOSTRAR LAS IMÁGENES CAPTURADAS #}
+            {% if body_photos_for_template %}
+            <h6 class="heading-small text-muted mb-4">Fotos de Detección de Cuerpo</h6>
+            <div class="pl-lg-4">
+                <div class="row">
+                    {% for photo_data in body_photos_for_template %}
+                    <div class="col-md-3 col-sm-4 col-6 mb-3">
+                        <img src="{{ photo_data }}" alt="Foto de cuerpo" class="img-fluid rounded shadow" style="max-width: 100%; height: auto;">
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <hr class="my-4" />
+            {% endif %}
+            {# FIN DE LA NUEVA SECCIÓN #}
             <div class="pl-lg-4">
                 <div class="row">
                     <div class="col-md-12">
@@ -244,5 +294,7 @@
 {% endblock content %}
 
 {% block javascripts %}
-<script src="{% static 'assets/js/camara.js' %}"></script>
+
+
+<script src="{% static 'assets/js/camara.js' %}?v=3.3"></script> {# CAMBIO AQUÍ: Incrementado la versión para cache busting #}
 {% endblock javascripts %}

@@ -122,3 +122,4 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 AUTH_USER_MODEL = 'perfil.Usuario'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+DATA_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024  # 20 MB

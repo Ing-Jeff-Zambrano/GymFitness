@@ -1,30 +1,20 @@
-"""
-URL configuration for Gym_Fitness project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
 from django.urls import path, include
-from perfil.views import login_view
-from django.conf import settings
-from django.conf.urls.static import static
+from django.conf import settings # Importa settings
+from django.conf.urls.static import static # Importa static
 
+# Asegúrate de importar login_view si lo usas directamente aquí
+from perfil.views import login_view # Asumiendo que login_view está en perfil/views.py
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',login_view,name='login'),
+    path('', login_view, name='login'),
     path('perfil/', include('perfil.urls')),
     path('progreso/', include('progreso.urls')),
     path('nutricion/', include('nutricion.urls')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
+
+# ESTAS LÍNEAS SON FUNDAMENTALES PARA SERVIR ARCHIVOS MEDIA EN DESARROLLO
+# Y DEBEN ESTAR DENTRO DE LA CONDICIÓN DEBUG
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
