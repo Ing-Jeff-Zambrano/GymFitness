@@ -1,24 +1,131 @@
-{% extends 'layouts/base.html' %}
-{% load static %}
+{% extends 'layouts/base.html' %} {# Hereda del template base principal #}
 
-{% block title %} Nutricion {% endblock title %}
+{% load static %} {# Para cargar archivos estáticos como progreso.css #}
+
+{% block title %}Análisis de Postura{% endblock %} {# Título específico para esta página #}
 
 {% block stylesheets %}
-    <link rel="stylesheet" href="{% static 'assets/css/nutricion.css' %}">
+    {{ block.super }} {# Mantiene los stylesheets de layouts/base.html #}
+    <style>
+      /* Estilos para ocultar la barra de navegación superior en esta página, heredados de progreso.html */
+      .main-content > nav.navbar {
+          display: none !important; /* Oculta la barra de navegación */
+      }
+      /* Ajusta el padding superior del contenido principal para que no quede un espacio vacío */
+      .main-content {
+          padding-top: 0 !important; /* Elimina el padding superior por defecto de Argon */
+      }
+      /* Si tu header principal de la página de progreso tiene un margen superior, ajústalo si es necesario */
+      .header.pb-6 {
+          padding-top: 0 !important; /* Asegura que el header empiece desde arriba si no hay navbar */
+          min-height: 400px; /* Mantener la altura mínima de tu banner */
+      }
+      /* Estilos para el reproductor de video */
+      video {
+          max-width: 100%;
+          height: auto;
+          border-radius: 0.75rem; /* rounded-xl */
+          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+      }
+    </style>
+    {# Si tienes un progreso.css específico, cárgalo aquí #}
+    <link rel="stylesheet" href="{% static 'assets/css/progreso.css' %}">
 {% endblock stylesheets %}
 
-{% block content %}
-    <div class="full-background">
-        <div class="content-wrapper">
-            <h1>Bienvenido a tu Seccion de Nutricion</h1>
-            <h1>{{ request.user.username|upper }}</h1>
-            <p>Aquí podrás ver tus rutinas y dietas alimenticias</p>
-            <p>¡Es hora de darle con todo a tu salud dietetica!</p>
-            <a href="#" class="btn-empezar">Empezar</a>
+{% block content %} {# Todo el contenido específico de la página de análisis de video va aquí #}
+
+    <div class="header pb-6 d-flex align-items-center"
+         style="min-height: 400px; background-image: url({% static 'assets/img/theme/profile-cover.jpg' %}); background-size: cover; background-position: center top;">
+        <span class="mask bg-gradient-default opacity-8"></span>
+        <div class="container-fluid d-flex align-items-center">
+            <div class="row">
+                <div class="col-lg-7 col-md-10">
+                    <h1 class="display-2 text-white">
+                        Análisis de Postura
+                    </h1>
+                    <p class="text-white mt-0 mb-5">
+                        Sube un video de tu ejercicio para analizar tu postura y técnica.
+                    </p>
+                    {# Puedes añadir un botón aquí si lo deseas, similar al de "Registrar Nueva Medición" #}
+                </div>
+            </div>
         </div>
     </div>
-    {% include "includes/footer-fullscreen.html" %}
+
+    <div class="container-fluid mt--6"> {# Contenedor principal de la página, similar a progreso.html #}
+        <div class="bg-white p-8 rounded-xl shadow-lg flex flex-col items-center space-y-6">
+            <p class="text-lg text-gray-700 text-center">
+                Utiliza este módulo para cargar un video y obtener feedback sobre tu técnica de ejercicio.
+            </p>
+
+            <!-- Formulario de Subida de Video -->
+            <form method="post" enctype="multipart/form-data" class="w-full max-w-md space-y-4">
+                {% csrf_token %}
+                <label for="video_ejercicio" class="block text-sm font-medium text-gray-700">
+                    Selecciona tu video de ejercicio:
+                </label>
+                <input type="file" name="video_ejercicio" id="video_ejercicio" accept="video/*"
+                       class="block w-full text-sm text-gray-500
+                              file:mr-4 file:py-2 file:px-4
+                              file:rounded-full file:border-0
+                              file:text-sm file:font-semibold
+                              file:bg-blue-50 file:text-blue-700
+                              hover:file:bg-blue-100 cursor-pointer"
+                       onchange="previewVideo(event)">
+
+                <button type="submit"
+                        class="w-full px-6 py-3 bg-green-600 text-white font-bold rounded-lg shadow-md
+                               hover:bg-green-700 transition duration-300 ease-in-out transform hover:scale-105">
+                    Subir y Analizar Video
+                </button>
+            </form>
+
+            <!-- Área de Previsualización y Mensajes -->
+            {% if uploaded_file_url %}
+                <div class="mt-8 w-full max-w-2xl">
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-4 text-center">Video Subido:</h2>
+                    <video controls autoplay muted>
+                        <source src="{{ uploaded_file_url }}" type="video/mp4">
+                        Tu navegador no soporta la etiqueta de video.
+                    </video>
+                    <p class="text-center text-green-600 font-medium mt-4">{{ message }}</p>
+                </div>
+            {% else %}
+                <div class="mt-8 w-full max-w-2xl bg-gray-50 p-6 rounded-lg text-center text-gray-500">
+                    <p>No hay video seleccionado para previsualizar.</p>
+                    <p>Sube un archivo de video (MP4, WebM, etc.) para comenzar.</p>
+                </div>
+            {% endif %}
+
+            <!-- Espacio para resultados del análisis (se llenará en futuras fases) -->
+            <div id="analysis-results" class="mt-8 w-full max-w-2xl bg-gray-50 p-6 rounded-lg shadow-inner hidden">
+                <h2 class="text-2xl font-semibold text-gray-900 mb-4 text-center">Resultados del Análisis:</h2>
+                <p class="text-gray-700">Aquí se mostrarán los resultados del análisis de postura.</p>
+                <!-- Por ejemplo, un video procesado, gráficos, texto con feedback -->
+            </div>
+        </div>
+    </div>
+
+    {% include "includes/footer-fullscreen.html" %} {# Si lo tienes en layouts/base.html, puedes quitarlo aquí #}
+
 {% endblock content %}
 
 {% block javascripts %}
+    {{ block.super }} {# Mantiene los javascripts de layouts/base.html #}
+    <script>
+        function previewVideo(event) {
+            const videoPlayer = document.querySelector('video');
+            const file = event.target.files[0];
+            if (file) {
+                const fileURL = URL.createObjectURL(file);
+                videoPlayer.src = fileURL;
+                videoPlayer.style.display = 'block'; // Asegurarse de que el reproductor sea visible
+                videoPlayer.load(); // Cargar el video para la previsualización
+                videoPlayer.play();
+            } else {
+                videoPlayer.style.display = 'none'; // Ocultar si no hay archivo
+                videoPlayer.src = '';
+            }
+        }
+    </script>
 {% endblock javascripts %}

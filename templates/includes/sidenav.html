@@ -31,11 +31,12 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link {% if 'tables' in segment %} active {% endif %}" href="/nutricion">
-              <i class="fas fa-medal" style="font-size: 1.5rem; margin-right: 0.3rem; color: #8FBC8F;"></i>
-              <span class="nav-link-text" style="font-size: 1.4rem;">Control</span>
-            </a>
-          </li>
+  {# Actualiza el href con la URL correcta para tu vista de análisis de video #}
+  <a class="nav-link {% if 'analisis_postura' in segment %} active {% endif %}" href="{% url 'analisis_postura:analizar_video' %}">
+    <i class="fas fa-video" style="font-size: 1.5rem; margin-right: 0.3rem; color: #8FBC8F;"></i> {# Cambié el icono a video #}
+    <span class="nav-link-text" style="font-size: 1.4rem;">Análisis de Postura</span> {# Cambié el texto #}
+  </a>
+</li>
 
         </ul>
         <!-- Divider -->

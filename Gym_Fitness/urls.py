@@ -11,7 +11,7 @@ urlpatterns = [
     path('', login_view, name='login'),
     path('perfil/', include('perfil.urls')),
     path('progreso/', include('progreso.urls')),
-    path('nutricion/', include('nutricion.urls')),
+    path('analisis-postura/', include('nutricion.urls', namespace='analisis_postura')),
 ]
 
 # ESTAS LÍNEAS SON FUNDAMENTALES PARA SERVIR ARCHIVOS MEDIA EN DESARROLLO
