@@ -1,91 +1,71 @@
-/* Estilos existentes */
-.full-background {
-    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/static/assets/img/fondo.jpg');
-    background-size: cover; /* Cambiado de 100% auto a cover para mejor adaptabilidad */
-    background-repeat: no-repeat;
-    background-position: center;
-    height: 80vh; /* Se mantiene para el banner inicial */
-    color: #f8f9fa;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-}
+/* NOTA IMPORTANTE: Las reglas para ocultar la barra de navegación y ajustar el padding
+   se han MOVIDO a un bloque <style> directamente en progreso/index.html.
+   Esto asegura que solo afecten a la página de progreso y no al dashboard. */
 
-.content-wrapper {
-    max-width: 800px;
-    padding: 20px;
-}
-
-.content-wrapper h1 {
-    font-size: 3em;
-    margin-bottom: 10px;
-    color: white;
-}
-
-.content-wrapper p {
-    font-size: 1.2em;
-    margin-bottom: 20px;
-}
-
-.btn-empezar { /* Este botón ya no se usará directamente, pero se mantienen los estilos si lo reutilizas */
-    display: inline-block;
-    padding: 12px 24px;
-    font-size: 1.3em;
-    text-decoration: none;
-    color: white;
-    background-color: #ff6f00;
-    border-radius: 8px;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-    border: none;
-    cursor: pointer;
-}
-
-.btn-empezar:hover {
-    background-color: #e65100;
-    transform: scale(1.05);
-}
-
-nav.navbar.navbar-top.navbar-dark.bg-primary.border-bottom {
-  background-color: black !important; /* Gris oscuro */
-}
-
-/* --- Nuevos estilos para el dashboard de progreso --- */
-
-/* Ajuste para el header de Argon Dashboard */
-.header.pb-6 {
-    padding-bottom: 3rem !important; /* Ajusta el padding si es necesario */
-}
-
-/* Estilos para los gráficos */
-.chart-container {
-    position: relative;
-    height: 300px; /* Altura fija para los gráficos */
+/* Estilos para los contenedores de los gráficos (aplicable a ambos .chart en dashboard y progreso) */
+.chart { /* La clase 'chart' que envuelve el div de D3.js o el canvas de Chart.js */
     width: 100%;
+    height: 350px; /* Altura explícita para el contenedor del gráfico */
+    display: block; /* Asegura que el div se comporte como un bloque */
+    overflow: hidden; /* Evita que el contenido del gráfico se desborde */
 }
 
-/* Estilos para la tabla de mediciones */
+/* Estilos para el SVG generado por D3.js y el Canvas de Chart.js (si estuviera presente) */
+.chart svg,
+.chart canvas { /* Asegura que ambos llenen su contenedor */
+    width: 100%;
+    height: 100%; /* Ocupa el 100% del ancho y altura de su padre '.chart' */
+    display: block; /* Elimina márgenes extra */
+}
+
+/* Estilos específicos para el SVG de D3.js (línea, puntos, ejes) */
+.axis path,
+.axis line {
+    fill: none;
+    stroke: #cbd5e0; /* stroke-gray-400 de Tailwind */
+    shape-rendering: crispEdges;
+}
+.axis text {
+    font-size: 0.875rem; /* text-sm de Tailwind */
+    fill: #4b5563; /* text-gray-700 de Tailwind */
+}
+.line {
+    fill: none;
+    stroke: #4A90E2; /* Un azul agradable */
+    stroke-width: 2px;
+}
+.dot {
+    fill: #4A90E2; /* Color de los puntos */
+    stroke: #ffffff; /* Borde blanco para los puntos */
+    stroke-width: 1.5px;
+    cursor: pointer; /* Indicar que es clickeable */
+    transition: all 0.2s ease-in-out; /* Transición suave para el resaltado */
+}
+.dot.selected {
+    fill: #FF5733; /* Un color de resaltado diferente (naranja/rojo) */
+    stroke: #ffffff;
+    stroke-width: 2.5px;
+    r: 6px; /* Aumentar el radio */
+}
+
+/* Otros estilos generales que ya tenías en progreso.css */
+/* Por ejemplo, estilos para tablas, tarjetas, etc. */
 .table-responsive {
     overflow-x: auto; /* Asegura que la tabla sea responsive */
 }
-
-/* Mejoras visuales para las tarjetas de stats */
 .card-stats .card-body {
     padding: 1.5rem;
 }
-
 .card-stats .icon-shape {
     font-size: 1.5rem;
     width: 3.5rem;
     height: 3.5rem;
     line-height: 3.5rem;
 }
-
 .card-stats .card-title {
     font-size: 0.8rem;
     letter-spacing: 0.04em;
 }
-
 .card-stats .h2 {
     font-size: 1.8rem;
 }

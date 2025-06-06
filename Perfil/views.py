@@ -116,13 +116,29 @@ def dashboard(request):
         imc_calculado_para_medicion = None
         if medicion.peso is not None and medicion.estatura is not None and medicion.estatura > 0:
             estatura_m = float(medicion.estatura) / 100.0
-            imc_calculado_para_medicion = round(float(medicion.peso) / (estatura_m ** 2), 2)
+            if estatura_m > 0: # Evitar división por cero
+                imc_calculado_para_medicion = round(float(medicion.peso) / (estatura_m ** 2), 2)
         medicion.imc_valor = imc_calculado_para_medicion  # Adjuntar el IMC calculado al objeto
+
+    # --- NUEVA LÓGICA: Preparar datos para el gráfico de peso D3.js en el dashboard ---
+    # Obtener TODAS las mediciones del cuerpo para el usuario actual, ordenadas por fecha_medicion
+    mediciones_para_d3_dashboard = MedicionCuerpo.objects.filter(usuario=request.user).order_by('fecha_medicion')
+    data_peso_dashboard = []
+    for med in mediciones_para_d3_dashboard:
+        if med.peso is not None and med.fecha_medicion is not None:
+            data_peso_dashboard.append({
+                'fecha': med.fecha_medicion.strftime('%Y-%m-%d'),  # Formato de fecha esperado por D3.js
+                'peso': float(med.peso)
+            })
+    # Convertir la lista de objetos a una cadena JSON para pasar al frontend
+    fechas_pesos_json_dashboard = json.dumps(data_peso_dashboard, default=str)
+
 
     context = {
         'tipo_cuerpo': tipo_cuerpo,
         'ultima_medicion': ultima_medicion,
-        'mediciones_recientes': mediciones_recientes,  # <-- PASAMOS ESTO AL CONTEXTO DEL DASHBOARD
+        'mediciones_recientes': mediciones_recientes,
+        'fechas_pesos_json_dashboard': fechas_pesos_json_dashboard, # ¡NUEVO! Datos para el gráfico D3.js
     }
     return render(request, 'perfil/dashboard.html', context)
 
