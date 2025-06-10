@@ -19,6 +19,31 @@
           padding-top: 0 !important; /* Asegura que el header empiece desde arriba si no hay navbar */
           min-height: 400px; /* Mantener la altura mínima de tu banner */
       }
+      body {
+          font-family: "Inter", sans-serif; /* Si no lo tienes ya en base.html */
+      }
+      #videoContainer {
+          position: relative;
+          width: 100%; /* Sigue tomando el 100% de su padre, pero ahora con un max-width */
+          padding-top: 54%; /* Mantiene la relación de aspecto 16:9 */
+          background-color: #e2e8f0; /* Color de fondo si el video no carga o hay barras */
+          border-radius: 0.5rem; /* Esquinas redondeadas */
+          overflow: hidden;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Sombra */
+
+          /* --- PROPIEDADES CLAVE PARA HACER EL VIDEO MÁS PEQUEÑO Y CENTRARLO --- */
+          max-width: 500px; /* Limita el ancho máximo del contenedor del video. Puedes ajustar este valor (ej. 350px, 500px, etc.) */
+          margin: 0 auto; /* Centra el contenedor horizontalmente dentro de su espacio disponible */
+      }
+      #videoContainer video {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: contain; /* Asegura que la persona se vea completa (sin recortes de cabeza/pies) */
+          border-radius: 0.5rem; /* Asegura que el video también tenga las esquinas redondeadas */
+      }
     </style>
     <link rel="stylesheet" href="{% static 'assets/css/progreso.css' %}">
 {% endblock stylesheets %}
@@ -30,10 +55,10 @@
         <div class="container-fluid d-flex align-items-center">
             <div class="row">
                 <div class="col-lg-7 col-md-10">
-                    <h1 class="display-2 text-white">
+                    <h1 class="display-3 text-white">
                         Bienvenido a tu Progreso, {{ request.user.first_name|upper }}!
                     </h1>
-                    <p class="text-white mt-0 mb-5">
+                    <p class="text-white mt-0 mb-1">
                         Aquí podrás ver tu avance, estadísticas y la evolución de tus métricas.
                         ¡Es hora de darlo todo y alcanzar tus metas!
                     </p>
@@ -43,7 +68,7 @@
         </div>
     </div>
 
-    <div class="container-fluid mt--6">
+    <div class="container-fluid mt--7">
         <div class="row">
             <!-- Tarjetas de Métricas Clave -->
             <div class="col-xl-3 col-md-6">
@@ -131,27 +156,29 @@
                     </div>
                 </div>
             </div>
-            <!-- Sección de Tipo de Cuerpo (RESTAURADA CON CANVAS PARA MANTENER ALTURA) -->
+            <!-- Sección de Tipo de Cuerpo CON VIDEO DINÁMICO -->
             <div class="col-xl-6">
                 <div class="card">
-                    <div class="card-header bg-transparent">
-                        <div class="row align-items-center">
-                            <div class="col">
-                            <h6 class="text-uppercase text-muted ls-1 mb-1">Tipo de Cuerpo</h6>
-                            <h5 class="h3 mb-0">
-                                {% if tipo_cuerpo %}
-                                    {{ tipo_cuerpo|default:"No determinado" }}
-                                {% else %}
-                                    No determinado
-                                {% endif %}
-                            </h5>
-                        </div>
-                        </div>
+                    <div class="card-header bg-transparent py-3 px-6 border-b border-gray-200"> {# AÑADIR CLASES: py-3 px-6 border-b border-gray-200 #}
+                        <div class="flex items-center justify-between"> {# AÑADIR ESTE DIV #}
+                            <div class="flex-grow"> {# AÑADIR ESTE DIV #}
+                                <h6 class="text-uppercase text-muted text-sm tracking-wide mb-0">Tipo de Cuerpo</h6> {# AÑADIR text-sm tracking-wide, CAMBIAR ls-1 por text-sm tracking-wide, y mb-1 por mb-0 #}
+                                <h5 class="h3 font-bold text-gray-800 mt-1 mb-0"> {# AÑADIR font-bold text-gray-800 mt-1 mb-0 #}
+                                    <span id="displayBodyType"> {# AÑADIR EL SPAN Y SU ID #}
+                                        {% if tipo_cuerpo %}
+                                            {{ tipo_cuerpo|default:"No determinado" }}
+                                        {% else %}
+                                            No determinado
+                                        {% endif %}
+                                    </span>
+                                </h5>
+                            </div> {# CERRAR DIV flex-grow #}
+                        </div> {# CERRAR DIV flex #}
                     </div>
-                    <div class="card-body">
-                        <div class="chart">
-                            <canvas id="imc-chart"></canvas> {# Reintroducimos el canvas aquí #}
-                            {# No se dibujará el gráfico de IMC si no hay lógica Chart.js en el JS block #}
+                    <!-- Aquí el card-body se ha modificado para incluir el video -->
+                    <div class="card-body p-4 pt-2"> {# CAMBIAR CLASES: p-4 pt-2 #}
+                        <div id="videoContainer">
+                            <!-- El video se cargará aquí dinámicamente con JavaScript -->
                         </div>
                     </div>
                 </div>
@@ -375,5 +402,70 @@
         // Mensaje inicial en el display de peso (puede ser sobreescrito por initWeightChart)
         selectedWeightDisplay.textContent = "Haz clic en un punto para ver el peso.";
 
+    // Define la URL base para las imágenes estáticas desde Django
+        // Esta línea es crucial para que Django sirva correctamente los videos desde tu carpeta 'static'
+        const staticImgBaseUrl = "{% static 'assets/img/' %}";
+
+        // --- LÓGICA DEL VIDEO DINÁMICO POR TIPO DE CUERPO ---
+        // Obtenemos referencias a los elementos HTML
+        const videoContainer = document.getElementById('videoContainer');
+        const displayBodyTypeSpan = document.getElementById('displayBodyType'); // Ya existe en tu HTML, pero útil si quieres actualizarlo con JS
+
+        // Obtenemos el tipo de cuerpo desde el template Jinja.
+        // Asegúrate de que el valor en Jinja esté en minúsculas para que coincida con el nombre del archivo del video.
+        // Por ejemplo, si tipo_cuerpo es "Ectomorfo", aquí se convierte a "ectomorfo".
+        const initialBodyType = "{{ tipo_cuerpo|default:'ectomorfo' | lower }}";
+
+        /**
+         * Carga y reproduce el video correspondiente al tipo de cuerpo.
+         * @param {string} bodyType - El tipo de cuerpo (ej. 'ectomorfo', 'mesomorfo', 'endomorfo').
+         */
+        function loadVideo(bodyType) {
+            // Limpiamos cualquier contenido previo en el contenedor de video
+            videoContainer.innerHTML = '';
+
+            // Si el tipo de cuerpo es "No determinado" o vacío, no cargamos un video, mostramos un mensaje.
+            if (!bodyType || bodyType === 'no determinado') {
+                videoContainer.innerHTML = `
+                    <div class="flex items-center justify-center h-full text-gray-500 text-center p-4">
+                        <p>Tipo de cuerpo no determinado.<br>No hay video disponible.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Creamos un nuevo elemento de video
+            const videoElement = document.createElement('video');
+            // Usamos la variable staticImgBaseUrl para construir la ruta completa al video
+            videoElement.src = `${staticImgBaseUrl}${bodyType}.mp4`;
+            videoElement.autoplay = true;     // Reproducción automática
+            videoElement.loop = true;         // Reproducción en bucle
+            videoElement.muted = true;        // Silenciar el video (necesario para autoplay en muchos navegadores)
+            videoElement.playsinline = true;  // Asegura que se reproduzca en línea en dispositivos móviles (iOS)
+
+            // Añadimos clases para estilizado y para que el video llene el contenedor correctamente
+            // Estas clases corresponden a los estilos CSS que añadimos en el <style>
+            videoElement.classList.add('absolute', 'top-0', 'left-0', 'w-full', 'h-full', 'object-contain', 'rounded-lg', 'shadow-inner');
+
+            // Manejamos el caso donde el video no se puede cargar (ej. archivo no encontrado)
+            videoElement.onerror = () => {
+                videoContainer.innerHTML = `
+                    <div class="flex items-center justify-center h-full text-gray-500 text-center p-4">
+                        <p>Error: No se pudo cargar el video para ${bodyType}.<br>Verifica la ruta y el formato (ej. ectomorfo.mp4).</p>
+                    </div>
+                `;
+                console.error(`Error al cargar el video: ${staticImgBaseUrl}${bodyType}.mp4`);
+            };
+
+            // Añadimos el video al contenedor div#videoContainer
+            videoContainer.appendChild(videoElement);
+        }
+
+        // Llama a la función loadVideo cuando el DOM ha cargado completamente.
+        // Asegúrate de que esto se ejecuta después de que initWeightChart() si el orden importa.
+        document.addEventListener('DOMContentLoaded', function() {
+            // initWeightChart(); // Ya debería estar aquí si tu D3.js funciona
+            loadVideo(initialBodyType); // Inicializa el video del tipo de cuerpo
+        });
     </script>
 {% endblock javascripts %}

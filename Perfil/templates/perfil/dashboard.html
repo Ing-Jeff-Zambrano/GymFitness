@@ -1,5 +1,5 @@
 {% extends 'layouts/base.html' %}
-{% load static %} {# <-- ¡Esta línea DEBE ESTAR! #}
+{% load static %}
 
 {% block title %} Dashboard {% endblock title %}
 
@@ -7,6 +7,41 @@
     {{ block.super }}
     {# Carga tu CSS de progreso, que ahora contendrá los estilos para el gráfico D3.js #}
     <link rel="stylesheet" href="{% static 'assets/css/progreso.css' %}">
+
+    <style>
+      /* --- ESTILOS ESPECÍFICOS PARA EL VIDEO EN EL DASHBOARD --- */
+      /* Ajustes de fuente para Inter (si no está ya globalmente en base.html) */
+      body {
+          font-family: "Inter", sans-serif;
+      }
+      /* Contenedor del video para mantener la relación de aspecto y estilizado */
+      #videoContainerDashboard { /* Usamos un ID diferente para evitar conflictos con progreso.html */
+          position: relative;
+          width: 100%; /* Ocupa el 100% del ancho de su padre (que será el max-width que definamos) */
+          padding-top: 75%; /* Relación de aspecto 16:9 (9 / 16 = 0.5625) */
+          background-color: #e2e8f0; /* Color de fondo si el video no carga o hay barras */
+          border-radius: 0.5rem; /* Esquinas redondeadas */
+          overflow: hidden;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Sombra */
+
+          /* --- PROPIEDADES PARA CONTROLAR EL TAMAÑO Y CENTRAR EL VIDEO DENTRO DEL col-xl-4 --- */
+          /* Limita el ancho máximo del contenedor. Ajusta este valor en px o rem según necesites.
+             Dado que es un col-xl-4, un max-width como 250px o 300px podría ser apropiado.
+             O si prefieres, puedes usar max-w-xs, max-w-sm (clases de Tailwind) si no quieres pixel exacto aquí. */
+          max-width: 440px; /* Un valor inicial, ajústalo según necesites para el col-xl-4 */
+          margin: 0 auto; /* Centra el contenedor horizontalmente dentro de su espacio disponible */
+      }
+      /* El video en sí, para que ocupe todo el contenedor #videoContainerDashboard */
+      #videoContainerDashboard video {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: contain; /* Asegura que la persona se vea completa (sin recortes de cabeza/pies) */
+          border-radius: 0.5rem; /* Asegura que el video también tenga las esquinas redondeadas */
+      }
+    </style>
 {% endblock stylesheets %}
 
 {% block content %}
@@ -52,9 +87,9 @@
                                         <h5 class="card-title text-uppercase text-muted mb-0">Tipo de Cuerpo</h5>
                                         <span class="h2 font-weight-bold mb-0">
                                             {% if tipo_cuerpo %}
-                                                {{ tipo_cuerpo|default:"No determinado" }}
+                                                <span id="displayBodyTypeDashboard">{{ tipo_cuerpo|default:"No determinado" }}</span> {# ID para JS #}
                                             {% else %}
-                                                No determinado
+                                                <span id="displayBodyTypeDashboard">No determinado</span>
                                             {% endif %}
                                         </span>
                                     </div>
@@ -118,30 +153,34 @@
                     </div>
                 </div>
             </div>
+            {# MODIFICACIÓN DE LA SECCIÓN DE TIPO DE CUERPO PARA EL VIDEO #}
             <div class="col-xl-4">
                 <div class="card">
-                    <div class="card-header bg-transparent">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                <h6 class="text-uppercase text-muted ls-1 mb-1">Tu Tipo de Cuerpo</h6>
-                                <h5 class="h3 mb-0">
-                                    {% if tipo_cuerpo %}
-                                        {{ tipo_cuerpo|default:"No determinado" }}
-                                    {% else %}
-                                        No determinado
-                                    {% endif %}
+                    <div class="card-header bg-transparent py-3 px-6 border-b border-gray-200"> {# Añadimos estas clases para consistencia #}
+                        <div class="flex items-center justify-between">
+                            <div class="flex-grow">
+                                <h6 class="text-uppercase text-muted text-sm tracking-wide mb-0">Tu Tipo de Cuerpo</h6> {# Ajustamos clases #}
+                                <h5 class="h3 font-bold text-gray-800 mt-1 mb-0"> {# Ajustamos clases #}
+                                    <span id="displayBodyTypeDashboard"> {# Usamos el ID del span en la tarjeta de arriba para consistencia #}
+                                        {% if tipo_cuerpo %}
+                                            {{ tipo_cuerpo|default:"No determinado" }}
+                                        {% else %}
+                                            No determinado
+                                        {% endif %}
+                                    </span>
                                 </h5>
                             </div>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <div class="chart">
-                            {# Este div.chart se quedará vacío o puedes poner un mensaje aquí si no habrá otro gráfico #}
-                            <p class="text-center text-gray-500 mt-5">Detalles del tipo de cuerpo.</p>
+                    <div class="card-body p-4 pt-2"> {# Ajustamos padding para consistencia #}
+                        {# Aquí irá el contenedor del video #}
+                        <div id="videoContainerDashboard">
+                            <!-- El video se cargará aquí dinámicamente con JavaScript -->
                         </div>
                     </div>
                 </div>
             </div>
+            {# FIN DE LA MODIFICACIÓN DE LA SECCIÓN DE TIPO DE CUERPO #}
         </div>
         <div class="row">
             {# INICIO DEL DIV MODIFICADO: col-xl-8 con la tabla de Últimas Mediciones #}
@@ -214,6 +253,9 @@
   <script src="/static/assets/vendor/chart.js/dist/Chart.extension.js"></script>
 
   <script>
+    // Define la URL base para las imágenes estáticas desde Django
+    const staticImgBaseUrl = "{% static 'assets/img/' %}";
+
     // Datos pasados desde Django para el gráfico de Peso (D3.js) en el dashboard
     const dataPesoDashboard = JSON.parse('{{ fechas_pesos_json_dashboard|safe }}');
 
@@ -331,11 +373,71 @@
             .call(d3.axisLeft(yScaleDashboard));
     }
 
+    // --- LÓGICA DEL VIDEO DINÁMICO POR TIPO DE CUERPO para el DASHBOARD ---
+    // Obtenemos referencias a los elementos HTML
+    const videoContainerDashboard = document.getElementById('videoContainerDashboard');
+    const displayBodyTypeSpanDashboard = document.getElementById('displayBodyTypeDashboard');
+
+    // Obtenemos el tipo de cuerpo desde el template Jinja.
+    const initialBodyTypeDashboard = "{{ tipo_cuerpo|default:'ectomorfo' | lower }}";
+
+    /**
+     * Carga y reproduce el video correspondiente al tipo de cuerpo en el dashboard.
+     * @param {string} bodyType - El tipo de cuerpo (ej. 'ectomorfo', 'mesomorfo', 'endomorfo').
+     */
+    function loadVideoDashboard(bodyType) {
+        if (!videoContainerDashboard) {
+            console.error("Contenedor #videoContainerDashboard no encontrado.");
+            return;
+        }
+
+        // Limpiamos cualquier contenido previo en el contenedor de video
+        videoContainerDashboard.innerHTML = '';
+
+        // Si el tipo de cuerpo es "No determinado" o vacío, no cargamos un video, mostramos un mensaje.
+        if (!bodyType || bodyType === 'no determinado') {
+            videoContainerDashboard.innerHTML = `
+                <div class="flex items-center justify-center h-full text-gray-500 text-center p-4">
+                    <p>Tipo de cuerpo no determinado.<br>No hay video disponible.</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Creamos un nuevo elemento de video
+        const videoElement = document.createElement('video');
+        // Usamos la variable staticImgBaseUrl para construir la ruta completa al video
+        videoElement.src = `${staticImgBaseUrl}${bodyType}.mp4`;
+        videoElement.autoplay = true;     // Reproducción automática
+        videoElement.loop = true;         // Reproducción en bucle
+        videoElement.muted = true;        // Silenciar el video (necesario para autoplay en muchos navegadores)
+        videoElement.playsinline = true;  // Asegura que se reproduzca en línea en dispositivos móviles (iOS)
+
+        // Añadimos clases para estilizado y para que el video llene el contenedor correctamente
+        videoElement.classList.add('absolute', 'top-0', 'left-0', 'w-full', 'h-full', 'object-contain', 'rounded-lg', 'shadow-inner');
+
+        // Manejamos el caso donde el video no se puede cargar (ej. archivo no encontrado)
+        videoElement.onerror = () => {
+            videoContainerDashboard.innerHTML = `
+                <div class="flex items-center justify-center h-full text-gray-500 text-center p-4">
+                    <p>Error: No se pudo cargar el video para ${bodyType}.<br>Verifica la ruta y el formato (ej. ectomorfo.mp4).</p>
+                </div>
+            `;
+            console.error(`Error al cargar el video: ${staticImgBaseUrl}${bodyType}.mp4`);
+        };
+
+        // Añadimos el video al contenedor div#videoContainerDashboard
+        videoContainerDashboard.appendChild(videoElement);
+    }
+
+
     document.addEventListener('DOMContentLoaded', function() {
-        initWeightChartDashboard();
+        initWeightChartDashboard(); // Inicializa el gráfico de peso del dashboard
+        loadVideoDashboard(initialBodyTypeDashboard); // Inicializa el video del tipo de cuerpo del dashboard
     });
 
-    window.addEventListener('resize', initWeightChartDashboard);
+    window.addEventListener('resize', initWeightChartDashboard); // Redibuja el gráfico en resize
+    // No necesitamos listener de resize para el video si su contenedor ya es responsivo con padding-top y object-fit
 
     selectedWeightDisplayDashboard.textContent = "Haz clic en un punto para ver el peso.";
 

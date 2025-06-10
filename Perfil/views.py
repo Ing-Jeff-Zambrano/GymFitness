@@ -11,7 +11,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout, get_user_model, update_session_auth_hash
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
-from django.core.files.base import ContentFile  # Asegúrate de que esta importación esté aquí
+from django.core.files.base import ContentFile
+from django.views.decorators.cache import never_cache
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 from .forms import SignUpForm, LoginForm, UserProfileForm
 from .models import Usuario, MedicionCuerpo
@@ -97,7 +100,7 @@ def register(request):
         form = SignUpForm()
     return render(request, 'perfil/register.html', {"form": form, "msg": msg, "success": success})
 
-
+@never_cache
 @login_required
 def dashboard(request):
     # Obtener la última medición del cuerpo para el usuario actual
@@ -116,37 +119,35 @@ def dashboard(request):
         imc_calculado_para_medicion = None
         if medicion.peso is not None and medicion.estatura is not None and medicion.estatura > 0:
             estatura_m = float(medicion.estatura) / 100.0
-            if estatura_m > 0: # Evitar división por cero
+            if estatura_m > 0:
                 imc_calculado_para_medicion = round(float(medicion.peso) / (estatura_m ** 2), 2)
-        medicion.imc_valor = imc_calculado_para_medicion  # Adjuntar el IMC calculado al objeto
+        medicion.imc_valor = imc_calculado_para_medicion
 
     # --- NUEVA LÓGICA: Preparar datos para el gráfico de peso D3.js en el dashboard ---
-    # Obtener TODAS las mediciones del cuerpo para el usuario actual, ordenadas por fecha_medicion
     mediciones_para_d3_dashboard = MedicionCuerpo.objects.filter(usuario=request.user).order_by('fecha_medicion')
     data_peso_dashboard = []
     for med in mediciones_para_d3_dashboard:
         if med.peso is not None and med.fecha_medicion is not None:
             data_peso_dashboard.append({
-                'fecha': med.fecha_medicion.strftime('%Y-%m-%d'),  # Formato de fecha esperado por D3.js
+                'fecha': med.fecha_medicion.strftime('%Y-%m-%d'),
                 'peso': float(med.peso)
             })
-    # Convertir la lista de objetos a una cadena JSON para pasar al frontend
     fechas_pesos_json_dashboard = json.dumps(data_peso_dashboard, default=str)
-
 
     context = {
         'tipo_cuerpo': tipo_cuerpo,
         'ultima_medicion': ultima_medicion,
         'mediciones_recientes': mediciones_recientes,
-        'fechas_pesos_json_dashboard': fechas_pesos_json_dashboard, # ¡NUEVO! Datos para el gráfico D3.js
+        'fechas_pesos_json_dashboard': fechas_pesos_json_dashboard,
+        # 'is_authenticated_user': request.user.is_authenticated, # Ya no es necesario con el nuevo JS
     }
     return render(request, 'perfil/dashboard.html', context)
 
 
-@login_required
+@never_cache
 def logout_view(request):
     logout(request)
-    return redirect('login')
+    return HttpResponseRedirect(reverse('login'))
 
 
 @login_required
@@ -335,5 +336,6 @@ def perfil(request):
         'form': form,
         'ultima_medicion': ultima_medicion,
         'body_photos_for_template': body_photos_for_template,
+        'is_authenticated_user': request.user.is_authenticated,
     }
     return render(request, 'perfil/perfil.html', context)
