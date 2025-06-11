@@ -100,6 +100,7 @@ def register(request):
         form = SignUpForm()
     return render(request, 'perfil/register.html', {"form": form, "msg": msg, "success": success})
 
+
 @never_cache
 @login_required
 def dashboard(request):
@@ -152,178 +153,201 @@ def logout_view(request):
 
 @login_required
 def perfil(request):
+    # Obtener la última medición al inicio
     ultima_medicion = MedicionCuerpo.objects.filter(usuario=request.user).order_by('-fecha_medicion').first()
 
-    form = UserProfileForm(instance=request.user)
+    form = UserProfileForm(instance=request.user)  # Inicializar el formulario de perfil
 
     if request.method == 'POST':
         files_data = request.FILES.copy()
 
+        # --- MODIFICADO: Procesamiento de Foto de Perfil (si aplica) ---
         camera_photo_data = request.POST.get('camera_photo_data')
         if camera_photo_data:
             try:
                 format, imgstr = camera_photo_data.split(';base64,')
                 ext = format.split('/')[-1]
                 data = ContentFile(base64.b64decode(imgstr), name=f'{request.user.username}_perfil.{ext}')
-
                 files_data['foto_perfil'] = data
                 messages.success(request, "Foto de perfil capturada y lista para guardar.")
-                print("DEBUG: Foto de perfil base64 procesada y añadida a files_data.")
             except Exception as e:
-                print(f"Error al procesar la foto de la cámara (Base64): {e}")
-                messages.error(request, "Hubo un error al procesar la foto de la cámara.")
+                messages.error(request, f"Hubo un error al procesar la foto de la cámara: {e}")
 
         form = UserProfileForm(request.POST, files_data, instance=request.user)
+
+        # --- MODIFICADO: Extracción y validación de peso y estatura ---
+        peso_kg = None
+        estatura_cm = None
 
         peso_input_str = request.POST.get('peso')
         estatura_input_str = request.POST.get('estatura')
 
-        peso_kg = None
         if peso_input_str and peso_input_str.strip() != '':
             try:
                 peso_kg = float(peso_input_str)
             except ValueError:
                 messages.error(request, "El peso ingresado no es un número válido.")
+                peso_kg = None  # Asegurar que sea None si es inválido
 
-        estatura_cm = None
         if estatura_input_str and estatura_input_str.strip() != '':
             try:
                 estatura_cm = float(estatura_input_str)
             except ValueError:
                 messages.error(request, "La estatura ingresada no es un número válido.")
+                estatura_cm = None  # Asegurar que sea None si es inválido
 
-        body_photos_data = []
+        # --- NUEVO: Cálculo del IMC (obligatorio para clasificación) ---
+        imc_valor = None
+        if peso_kg is not None and estatura_cm is not None and estatura_cm > 0:
+            estatura_m = float(estatura_cm) / 100.0
+            if estatura_m > 0:
+                imc_valor = round(peso_kg / (estatura_m ** 2), 2)
+
+        # --- MODIFICADO: Procesamiento de Fotos de Medición (para detección de cuerpo) ---
+        body_photos_data = []  # Lista para almacenar las fotos procesadas en base64
+        promedio_ancho_hombros = None
+        promedio_ancho_caderas = None
+        has_valid_photo_landmarks = False  # Flag para indicar si se obtuvieron landmarks válidos de las fotos
+
         measurement_photo_data_json = request.POST.get('measurement_photo_data')
 
-        new_measurement_processed = False
-
         if measurement_photo_data_json and json.loads(measurement_photo_data_json):
-            print("DEBUG: Se detectaron fotos de medición. Creando una NUEVA MedicionCuerpo.")
             try:
                 body_photos_data = json.loads(measurement_photo_data_json)
-                print(f"DEBUG: Recibidas {len(body_photos_data)} fotos para detección de cuerpo.")
-            except json.JSONDecodeError as e:
-                print(f"ERROR: No se pudo decodificar el JSON de las fotos de medición: {e}")
+            except json.JSONDecodeError:
                 messages.error(request, "Error al procesar los datos de las fotos de medición.")
                 body_photos_data = []
 
             if body_photos_data:
-                hombros_anchos = []
-                caderas_anchas = []
+                hombros_anchos_temp = []
+                caderas_anchas_temp = []
 
                 for i, image_data_url in enumerate(body_photos_data):
-                    print(f"DEBUG: Procesando foto de medición {i + 1}...")
                     landmarks, ancho, alto = procesar_imagen_tipo_cuerpo(image_data_url)
 
-                    if landmarks:
-                        lm_hombro_izq = landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER]
-                        lm_hombro_der = landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER]
-                        lm_cadera_izq = landmarks[mp_pose.PoseLandmark.LEFT_HIP]
-                        lm_cadera_der = landmarks[mp_pose.PoseLandmark.RIGHT_HIP]
+                    min_conf_deteccion = 0.7  # Umbral de confianza para landmarks
+                    if landmarks and \
+                            landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER].visibility > min_conf_deteccion and \
+                            landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER].visibility > min_conf_deteccion and \
+                            landmarks[mp_pose.PoseLandmark.LEFT_HIP].visibility > min_conf_deteccion and \
+                            landmarks[mp_pose.PoseLandmark.RIGHT_HIP].visibility > min_conf_deteccion:
 
-                        min_conf_deteccion = 0.7
-                        if lm_hombro_izq.visibility > min_conf_deteccion and \
-                                lm_hombro_der.visibility > min_conf_deteccion and \
-                                lm_cadera_izq.visibility > min_conf_deteccion and \
-                                lm_cadera_der.visibility > min_conf_deteccion:
+                        hombro_izquierdo_px = int(landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER].x * ancho)
+                        hombro_derecho_px = int(landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER].x * ancho)
+                        ancho_hombros_px = abs(hombro_derecho_px - hombro_izquierdo_px)
+                        hombros_anchos_temp.append(ancho_hombros_px)
 
-                            hombro_izquierdo_px = int(lm_hombro_izq.x * ancho)
-                            hombro_derecho_px = int(lm_hombro_der.x * ancho)
-                            ancho_hombros_px = abs(hombro_derecho_px - hombro_izquierdo_px)
-                            hombros_anchos.append(ancho_hombros_px)
-
-                            cadera_izquierda_px = int(lm_cadera_izq.x * ancho)
-                            cadera_derecha_px = int(lm_cadera_der.x * ancho)
-                            ancho_caderas_px = abs(cadera_derecha_px - cadera_izquierda_px)
-                            caderas_anchas.append(ancho_caderas_px)
-                            print(
-                                f"DEBUG: Foto {i + 1} - Hombros detectados: {ancho_hombros_px:.2f}px, Caderas detectadas: {ancho_caderas_px:.2f}px")
-                        else:
-                            print(
-                                f"DEBUG: Foto {i + 1} - Visibilidad de landmarks clave baja. Saltando esta foto para cálculo de medidas.")
+                        cadera_izquierda_px = int(landmarks[mp_pose.PoseLandmark.LEFT_HIP].x * ancho)
+                        cadera_derecha_px = int(landmarks[mp_pose.PoseLandmark.RIGHT_HIP].x * ancho)
+                        ancho_caderas_px = abs(cadera_derecha_px - cadera_izquierda_px)
+                        caderas_anchas_temp.append(ancho_caderas_px)
                     else:
                         print(
-                            f"DEBUG: Foto {i + 1} - No se detectaron landmarks. Saltando esta foto para cálculo de medidas.")
+                            f"DEBUG: Foto {i + 1} - No se detectaron landmarks o visibilidad baja. Saltando foto para cálculo de medidas.")
 
-                promedio_ancho_hombros = sum(hombros_anchos) / len(hombros_anchos) if hombros_anchos else None
-                promedio_ancho_caderas = sum(caderas_anchas) / len(caderas_anchas) if caderas_anchas else None
-
-                print(
-                    f"DEBUG: Promedio Ancho Hombros: {promedio_ancho_hombros}, Promedio Ancho Caderas: {promedio_ancho_caderas}")
-
-                medicion_data = {
-                    'usuario': request.user,
-                    'peso': peso_kg,
-                    'estatura': estatura_cm,
-                    'ancho_hombros': promedio_ancho_hombros,
-                    'ancho_caderas': promedio_ancho_caderas,
-                    'icc_estimado': None,
-                    'relacion_hombro_cintura': None,
-                    'tipo_cuerpo': "No determinado",
-                    'body_photos_data': json.dumps(body_photos_data),
-                }
-
-                if promedio_ancho_hombros is not None and promedio_ancho_caderas is not None and promedio_ancho_caderas > 0:
-                    relacion_hombro_cadera_simple = promedio_ancho_hombros / promedio_ancho_caderas
-                    medicion_data['relacion_hombro_cintura'] = relacion_hombro_cadera_simple
-
-                    if relacion_hombro_cadera_simple > 1.05:
-                        medicion_data['tipo_cuerpo'] = "Mesomorfo"
-                    elif relacion_hombro_cadera_simple < 0.95:
-                        medicion_data['tipo_cuerpo'] = "Endomorfo"
-                    else:
-                        medicion_data['tipo_cuerpo'] = "Ectomorfo"
-
-                    print(
-                        f"DEBUG: Tipo de cuerpo estimado: {medicion_data['tipo_cuerpo']} (Relación Hombro/Cadera: {relacion_hombro_cadera_simple:.2f})")
+                if hombros_anchos_temp and caderas_anchas_temp and len(hombros_anchos_temp) > 0 and len(
+                        caderas_anchas_temp) > 0:
+                    promedio_ancho_hombros = sum(hombros_anchos_temp) / len(hombros_anchos_temp)
+                    promedio_ancho_caderas = sum(caderas_anchas_temp) / len(caderas_anchas_temp)
+                    has_valid_photo_landmarks = True
                 else:
-                    print("DEBUG: No hay suficientes datos de hombros/caderas para calcular el tipo de cuerpo.")
-                    medicion_data['tipo_cuerpo'] = "No determinado (datos insuficientes)"
-
-                MedicionCuerpo.objects.create(**medicion_data)
-                messages.success(request, "Medición corporal registrada exitosamente.")
-                new_measurement_processed = True
+                    print("DEBUG: No se obtuvieron promedios válidos de hombros/caderas de las fotos.")
             else:
-                messages.warning(request,
-                                 "Se inició la detección de cuerpo, pero no se recibieron fotos válidas para el cálculo.")
+                messages.warning(request, "Se intentó la detección de cuerpo, pero no se recibieron fotos.")
+                print("DEBUG: No se recibieron fotos de medición para procesar.")
 
-        elif (peso_kg is not None or estatura_cm is not None) and not new_measurement_processed:
+        # --- NUEVO: Lógica de Clasificación del Tipo de Cuerpo (IMC y FOTOS OBLIGATORIOS) ---
+        determined_body_type = "No se pudo establecer el tipo de cuerpo, datos insuficientes o en posición INCORRECTA"
+        relacion_hombro_cadera_simple = None
+
+        # Validar si ambos tipos de datos (fotos y IMC) son válidos y están presentes
+        is_photo_data_available_and_valid = (
+                    has_valid_photo_landmarks and promedio_ancho_caderas is not None and promedio_ancho_caderas > 0)
+        is_imc_data_available_and_valid = (imc_valor is not None)
+
+        if is_photo_data_available_and_valid and is_imc_data_available_and_valid:
+            relacion_hombro_cadera_simple = promedio_ancho_hombros / promedio_ancho_caderas
+
+            # Lógica de clasificación combinada
+            if imc_valor < 18.5:
+                determined_body_type = "Ectomorfo"
+            elif imc_valor >= 25.0:
+                determined_body_type = "Endomorfo"
+            else:  # IMC entre 18.5 y 24.9 (rango saludable), usamos la relación para afinar
+                if relacion_hombro_cadera_simple > 1.05:
+                    determined_body_type = "Mesomorfo"
+                elif relacion_hombro_cadera_simple < 0.95:
+                    determined_body_type = "Endomorfo"
+                else:  # Relación entre 0.95 y 1.05
+                    determined_body_type = "Ectomorfo"
             print(
-                "DEBUG: No se detectaron fotos de medición, pero sí peso/estatura. Actualizando o creando MedicionCuerpo.")
-            if ultima_medicion:
-                print("DEBUG: Última medición existente encontrada. Verificando cambios en peso/estatura.")
-                if (peso_kg is not None and ultima_medicion.peso != peso_kg) or \
-                        (estatura_cm is not None and ultima_medicion.estatura != estatura_cm):
-                    ultima_medicion.peso = peso_kg if peso_kg is not None else ultima_medicion.peso
-                    ultima_medicion.estatura = estatura_cm if estatura_cm is not None else ultima_medicion.estatura
-                    ultima_medicion.save(update_fields=['peso', 'estatura'])
-                    messages.success(request, "Peso y/o estatura actualizados en la última medición.")
-                    print("DEBUG: Peso y/o estatura actualizados en la última medición existente.")
-                else:
-                    print("DEBUG: Peso y estatura no cambiaron en la última medición. No se guardó en MedicionCuerpo.")
-            else:
-                print("DEBUG: No hay mediciones existentes. Creando nueva medición solo con peso/estatura.")
-                MedicionCuerpo.objects.create(
-                    usuario=request.user,
-                    peso=peso_kg,
-                    estatura=estatura_cm,
-                    tipo_cuerpo="No determinado (solo peso/estatura)",
-                    body_photos_data="[]"
-                )
-                messages.success(request, "Nueva medición creada con peso y/o estatura.")
-
-        if form.is_valid():
-            print("DEBUG: UserProfileForm es válido. Intentando guardar...")
-            form.save()
-            print("DEBUG: UserProfileForm guardado.")
-            messages.success(request, "Perfil actualizado exitosamente.")
+                f"DEBUG: Tipo de cuerpo clasificado como: {determined_body_type} (IMC: {imc_valor}, Relación H/C: {relacion_hombro_cadera_simple:.2f})")
         else:
-            print("DEBUG: UserProfileForm NO ES VÁLIDO.")
-            print("ERRORES DEL FORMULARIO:", form.errors)
-            messages.error(request, "Hubo un error al guardar el perfil. Por favor, revisa los datos.")
+            if not is_photo_data_available_and_valid:
+                print("DEBUG: Datos de fotos no válidos o insuficientes para clasificación.")
+            if not is_imc_data_available_and_valid:
+                print("DEBUG: Datos de peso/estatura (IMC) no válidos o insuficientes para clasificación.")
+            messages.error(request, determined_body_type)  # Mostrar el mensaje de error al usuario
+            print("DEBUG: No se pudo clasificar el tipo de cuerpo debido a datos insuficientes/incorrectos.")
 
+        # --- MODIFICADO: Creación o Actualización de MedicionCuerpo ---
+        # Solo guardamos una nueva medición si se proporcionaron datos de fotos O si se actualizaron peso/estatura
+        # y no se procesaron fotos (para evitar duplicados o mediciones vacías)
+
+        # Criterio para crear una NUEVA MedicionCuerpo:
+        # Se proporcionaron y procesaron fotos (aunque la clasificación pueda fallar)
+        if body_photos_data:  # Implica un intento de nueva medición con fotos
+            MedicionCuerpo.objects.create(
+                usuario=request.user,
+                peso=peso_kg,
+                estatura=estatura_cm,
+                ancho_hombros=promedio_ancho_hombros,
+                ancho_caderas=promedio_ancho_caderas,
+                icc_estimado=imc_valor,  # Guardar IMC aquí
+                relacion_hombro_cintura=relacion_hombro_cadera_simple,
+                tipo_cuerpo=determined_body_type,  # El tipo de cuerpo final o el mensaje de error
+                body_photos_data=json.dumps(body_photos_data),
+                fecha_medicion=datetime.now()  # Fecha de la nueva medición
+            )
+            messages.success(request,
+                             "Medición corporal registrada exitosamente." if determined_body_type != "No se pudo establecer el tipo de cuerpo, datos insuficientes o en posición INCORRECTA" else determined_body_type)
+            print("DEBUG: Nueva MedicionCuerpo creada con datos de foto.")
+
+        # Criterio para ACTUALIZAR la última MedicionCuerpo existente (si no se proporcionaron fotos)
+        # Solo si hay una última medición y se cambió el peso o la estatura
+        elif ultima_medicion and ((peso_kg is not None and ultima_medicion.peso != peso_kg) or \
+                                  (estatura_cm is not None and ultima_medicion.estatura != estatura_cm)):
+            ultima_medicion.peso = peso_kg if peso_kg is not None else ultima_medicion.peso
+            ultima_medicion.estatura = estatura_cm if estatura_cm is not None else ultima_medicion.estatura
+            ultima_medicion.icc_estimado = imc_valor  # Actualizar IMC
+            ultima_medicion.relacion_hombro_cintura = relacion_hombro_cadera_simple  # Actualizar relación si se recalcula
+            ultima_medicion.tipo_cuerpo = determined_body_type  # Actualizar el tipo de cuerpo o mensaje de error
+            ultima_medicion.fecha_medicion = datetime.now()  # Actualizar la fecha de modificación
+            ultima_medicion.save(
+                update_fields=['peso', 'estatura', 'icc_estimado', 'relacion_hombro_cintura', 'tipo_cuerpo',
+                               'fecha_medicion'])
+            messages.success(request,
+                             "Peso y/o estatura actualizados en la última medición." if determined_body_type != "No se pudo establecer el tipo de cuerpo, datos insuficientes o en posición INCORRECTA" else determined_body_type)
+            print("DEBUG: Última MedicionCuerpo actualizada (solo peso/estatura).")
+
+        # Mensaje si no hubo datos significativos para guardar/actualizar
+        elif not body_photos_data and peso_kg is None and estatura_cm is None:
+            messages.warning(request,
+                             "No se proporcionaron fotos ni datos de peso/estatura para registrar una medición.")
+            print("DEBUG: No se proporcionaron datos para nueva medición ni actualización.")
+
+        # --- MODIFICADO: Manejo de UserProfileForm ---
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Perfil de usuario actualizado exitosamente.")
+        else:
+            messages.error(request, "Hubo un error al guardar el perfil. Por favor, revisa los datos.")
+            print("ERRORES DEL FORMULARIO UserProfileForm:", form.errors)
+
+    # --- MODIFICADO: Obtener la última medición de nuevo para el contexto (después de cualquier guardado) ---
     ultima_medicion = MedicionCuerpo.objects.filter(usuario=request.user).order_by('-fecha_medicion').first()
 
+    # --- El resto del contexto se mantiene igual ---
     body_photos_for_template = []
     if ultima_medicion and ultima_medicion.body_photos_data:
         try:

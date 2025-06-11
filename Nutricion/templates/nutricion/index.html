@@ -21,12 +21,7 @@
           min-height: 400px; /* Mantener la altura mínima de tu banner */
       }
       /* Estilos para el reproductor de video */
-      video {
-          max-width: 100%;
-          height: auto;
-          border-radius: 0.75rem; /* rounded-xl */
-          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
-      }
+
     </style>
     {# Si tienes un progreso.css específico, cárgalo aquí #}
     <link rel="stylesheet" href="{% static 'assets/css/progreso.css' %}">
@@ -39,93 +34,264 @@
         <span class="mask bg-gradient-default opacity-8"></span>
         <div class="container-fluid d-flex align-items-center">
             <div class="row">
-                <div class="col-lg-7 col-md-10">
+                <div class="col-lg-7 col-md-8">
                     <h1 class="display-2 text-white">
                         Análisis de Postura
                     </h1>
-                    <p class="text-white mt-0 mb-5">
+                    <p class="text-white mt-0 mb-8">
                         Sube un video de tu ejercicio para analizar tu postura y técnica.
                     </p>
-                    {# Puedes añadir un botón aquí si lo deseas, similar al de "Registrar Nueva Medición" #}
+
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="container-fluid mt--6"> {# Contenedor principal de la página, similar a progreso.html #}
-        <div class="bg-white p-8 rounded-xl shadow-lg flex flex-col items-center space-y-6">
-            <p class="text-lg text-gray-700 text-center">
-                Utiliza este módulo para cargar un video y obtener feedback sobre tu técnica de ejercicio.
-            </p>
+    {# --- INICIO DE LAS NUEVAS SECCIONES DE EJERCICIOS --- #}
+    <div class="container-fluid mt--6"> {# Contenedor principal de las secciones de ejercicios #}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-4"> {# Grid responsivo para 2 columnas en medianos y grandes #}
 
-            <!-- Formulario de Subida de Video -->
-            <form method="post" enctype="multipart/form-data" class="w-full max-w-md space-y-4">
-                {% csrf_token %}
-                <label for="video_ejercicio" class="block text-sm font-medium text-gray-700">
-                    Selecciona tu video de ejercicio:
-                </label>
-                <input type="file" name="video_ejercicio" id="video_ejercicio" accept="video/*"
-                       class="block w-full text-sm text-gray-500
-                              file:mr-4 file:py-2 file:px-4
-                              file:rounded-full file:border-0
-                              file:text-sm file:font-semibold
-                              file:bg-blue-50 file:text-blue-700
-                              hover:file:bg-blue-100 cursor-pointer"
-                       onchange="previewVideo(event)">
+            {# Sección de Brazos #}
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-2">Brazos</h2>
+                <div class="space-y-6">
+                    {# Ejercicio 1: Curl de Biceps #}
+                    <div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
+                        <div class="w-full md:w-1/2">
+                            <h3 class="text-xl font-semibold text-gray-700 mb-2">1.- Curl de Biceps</h3>
+                            <p class="text-gray-600 text-sm">Ejercicio para fortalecer los bíceps.</p>
+                        </div>
+                        <div class="w-full md:w-1/2 flex flex-col items-center space-y-4"> {# MODIFICADO: Agregado flex-col items-center space-y-4 para alinear la imagen y los botones #}
+                            <img src="{% static 'assets/img/1.PNG' %}" alt="Imagen de referencia Curl de Biceps" class="rounded-lg shadow-md w-full h-auto object-cover max-w-[300px]">
 
-                <button type="submit"
-                        class="w-full px-6 py-3 bg-green-600 text-white font-bold rounded-lg shadow-md
-                               hover:bg-green-700 transition duration-300 ease-in-out transform hover:scale-105">
-                    Subir y Analizar Video
-                </button>
-            </form>
+                            {# BOTONES Y CAMPO DE ARCHIVO #}
+                            <div class="flex flex-col space-y-2 w-full max-w-[300px]"> {# Contenedor para los botones #}
+                                <label for="video_ejercicio_curl_biceps" class="block text-center py-2 px-4 rounded-lg border-0 text-sm font-semibold bg-blue-500 text-white hover:bg-blue-600 cursor-pointer transition duration-300 ease-in-out transform hover:scale-105 shadow-md">
+                                    Introducir Video
+                                </label>
+                                <input type="file" name="video_ejercicio_curl_biceps" id="video_ejercicio_curl_biceps" accept="video/*" class="hidden"> {# Campo de archivo oculto #}
 
-            <!-- Área de Previsualización y Mensajes -->
-            {% if uploaded_file_url %}
-                <div class="mt-8 w-full max-w-2xl">
-                    <h2 class="text-2xl font-semibold text-gray-900 mb-4 text-center">Video Subido:</h2>
-                    <video controls autoplay muted>
-                        <source src="{{ uploaded_file_url }}" type="video/mp4">
-                        Tu navegador no soporta la etiqueta de video.
-                    </video>
-                    <p class="text-center text-green-600 font-medium mt-4">{{ message }}</p>
+                                <button type="button"
+                                        class="w-full py-2 px-4 text-white font-bold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
+                                        style="background-color: #f56565 !important; hover:background-color: #c53030 !important;"> {# CAMBIADO EL COLOR AQUÍ A ROJO CON ESTILO INLINE #}
+                                    Validar Ejercicio
+                                </button>
+                                <div id="video_preview_curl_biceps" class="mt-2 w-full hidden"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="border-gray-200">
+                    {# Ejercicio 2: Extensiones de Tríceps #}
+                    <div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
+                        <div class="w-full md:w-1/2">
+                            <h3 class="text-xl font-semibold text-gray-700 mb-2">2.- Extensiones de Tríceps</h3>
+                            <p class="text-gray-600 text-sm">Aislamiento y fortalecimiento de tríceps.</p>
+                        </div>
+                        <div class="w-full md:w-1/2 flex flex-col items-center space-y-4"> {# MODIFICADO #}
+                            <img src="{% static 'assets/img/2.PNG' %}" alt="Imagen de referencia Extensiones de Triceps" class="rounded-lg shadow-md w-full h-auto object-cover max-w-[300px]">
+
+                            {# BOTONES Y CAMPO DE ARCHIVO #}
+                            <div class="flex flex-col space-y-2 w-full max-w-[300px]">
+                                <label for="video_ejercicio_extensiones_triceps" class="block text-center py-2 px-4 rounded-lg border-0 text-sm font-semibold bg-blue-500 text-white hover:bg-blue-600 cursor-pointer transition duration-300 ease-in-out transform hover:scale-105 shadow-md">
+                                    Introducir Video
+                                </label>
+                                <input type="file" name="video_ejercicio_extensiones_triceps" id="video_ejercicio_extensiones_triceps" accept="video/*" class="hidden">
+
+                                <button type="button"
+                                        class="w-full py-2 px-4 text-white font-bold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
+                                        style="background-color: #f56565 !important; hover:background-color: #c53030 !important;"> {# CAMBIADO EL COLOR AQUÍ A ROJO CON ESTILO INLINE #}
+                                    Validar Ejercicio
+                                </button>
+                                <div id="video_preview_extensiones_triceps" class="mt-2 w-full hidden"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            {% else %}
-                <div class="mt-8 w-full max-w-2xl bg-gray-50 p-6 rounded-lg text-center text-gray-500">
-                    <p>No hay video seleccionado para previsualizar.</p>
-                    <p>Sube un archivo de video (MP4, WebM, etc.) para comenzar.</p>
-                </div>
-            {% endif %}
+            </div>
 
-            <!-- Espacio para resultados del análisis (se llenará en futuras fases) -->
-            <div id="analysis-results" class="mt-8 w-full max-w-2xl bg-gray-50 p-6 rounded-lg shadow-inner hidden">
-                <h2 class="text-2xl font-semibold text-gray-900 mb-4 text-center">Resultados del Análisis:</h2>
-                <p class="text-gray-700">Aquí se mostrarán los resultados del análisis de postura.</p>
-                <!-- Por ejemplo, un video procesado, gráficos, texto con feedback -->
+            {# Sección de Hombros #}
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-2">Hombros</h2>
+                <div class="space-y-6">
+                    {# Ejercicio 3: Press de Hombros #}
+                    <div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
+                        <div class="w-full md:w-1/2">
+                            <h3 class="text-xl font-semibold text-gray-700 mb-2">3.- Press de Hombros</h3>
+                            <p class="text-gray-600 text-sm">Desarrollo de los deltoides.</p>
+                        </div>
+                        <div class="w-full md:w-1/2 flex flex-col items-center space-y-4"> {# MODIFICADO #}
+                            <img src="{% static 'assets/img/3.PNG' %}" alt="Imagen de referencia Press de Hombros" class="rounded-lg shadow-md w-full h-auto object-cover max-w-[300px]">
+
+                            {# BOTONES Y CAMPO DE ARCHIVO #}
+                            <div class="flex flex-col space-y-2 w-full max-w-[300px]">
+                                <label for="video_ejercicio_press_hombros" class="block text-center py-2 px-4 rounded-lg border-0 text-sm font-semibold bg-blue-500 text-white hover:bg-blue-600 cursor-pointer transition duration-300 ease-in-out transform hover:scale-105 shadow-md">
+                                    Introducir Video
+                                </label>
+                                <input type="file" name="video_ejercicio_press_hombros" id="video_ejercicio_press_hombros" accept="video/*" class="hidden">
+
+                                <button type="button"
+                                        class="w-full py-2 px-4 text-white font-bold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
+                                        style="background-color: #f56565 !important; hover:background-color: #c53030 !important;"> {# CAMBIADO EL COLOR AQUÍ A ROJO CON ESTILO INLINE #}
+                                    Validar Ejercicio
+                                </button>
+                                <div id="video_preview_press_hombros" class="mt-2 w-full hidden"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="border-gray-200">
+                    {# Ejercicio 4: Elevaciones Laterales #}
+                    <div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
+                        <div class="w-full md:w-1/2">
+                            <h3 class="text-xl font-semibold text-gray-700 mb-2">4.- Elevaciones Laterales</h3>
+                            <p class="text-gray-600 text-sm">Para dar amplitud a los hombros.</p>
+                        </div>
+                        <div class="w-full md:w-1/2 flex flex-col items-center space-y-4"> {# MODIFICADO #}
+                            <img src="{% static 'assets/img/4.PNG' %}" alt="Imagen de referencia Elevaciones Laterales" class="rounded-lg shadow-md w-full h-auto object-cover max-w-[300px]">
+
+                            {# BOTONES Y CAMPO DE ARCHIVO #}
+                            <div class="flex flex-col space-y-2 w-full max-w-[300px]">
+                                <label for="video_ejercicio_elevaciones_laterales" class="block text-center py-2 px-4 rounded-lg border-0 text-sm font-semibold bg-blue-500 text-white hover:bg-blue-600 cursor-pointer transition duration-300 ease-in-out transform hover:scale-105 shadow-md">
+                                    Introducir Video
+                                </label>
+                                <input type="file" name="video_ejercicio_elevaciones_laterales" id="video_ejercicio_elevaciones_laterales" accept="video/*" class="hidden">
+
+                                <button type="button"
+                                        class="w-full py-2 px-4 text-white font-bold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
+                                        style="background-color: #f56565 !important; hover:background-color: #c53030 !important;"> {# CAMBIADO EL COLOR AQUÍ A ROJO CON ESTILO INLINE #}
+                                    Validar Ejercicio
+                                </button>
+                                <div id="video_preview_elevaciones_laterales" class="mt-2 w-full hidden"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Sección de Espalda #}
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-2">Espalda</h2>
+                <div class="space-y-6">
+                    {# Ejercicio 5: Remo #}
+                    <div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
+                        <div class="w-full md:w-1/2">
+                            <h3 class="text-xl font-semibold text-gray-700 mb-2">5.- Remo</h3>
+                            <p class="text-gray-600 text-sm">Fortalecimiento de la espalda superior.</p>
+                        </div>
+                        <div class="w-full md:w-1/2 flex flex-col items-center space-y-4"> {# MODIFICADO #}
+                            <img src="{% static 'assets/img/5.PNG' %}" alt="Imagen de referencia Remo" class="rounded-lg shadow-md w-full h-auto object-cover max-w-[300px]">
+
+                            {# BOTONES Y CAMPO DE ARCHIVO #}
+                            <div class="flex flex-col space-y-2 w-full max-w-[300px]">
+                                <label for="video_ejercicio_remo" class="block text-center py-2 px-4 rounded-lg border-0 text-sm font-semibold bg-blue-500 text-white hover:bg-blue-600 cursor-pointer transition duration-300 ease-in-out transform hover:scale-105 shadow-md">
+                                    Introducir Video
+                                </label>
+                                <input type="file" name="video_ejercicio_remo" id="video_ejercicio_remo" accept="video/*" class="hidden">
+
+                                <button type="button"
+                                        class="w-full py-2 px-4 text-white font-bold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
+                                        style="background-color: #f56565 !important; hover:background-color: #c53030 !important;"> {# CAMBIADO EL COLOR AQUÍ A ROJO CON ESTILO INLINE #}
+                                    Validar Ejercicio
+                                </button>
+                                <div id="video_preview_remo" class="mt-2 w-full hidden"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="border-gray-200">
+                    {# Ejercicio 6: Peso Muerto #}
+                    <div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
+                        <div class="w-full md:w-1/2">
+                            <h3 class="text-xl font-semibold text-gray-700 mb-2">6.- Peso Muerto</h3>
+                            <p class="text-gray-600 text-sm">Ejercicio completo para la espalda y piernas.</p>
+                        </div>
+                        <div class="w-full md:w-1/2 flex flex-col items-center space-y-4"> {# MODIFICADO #}
+                            <img src="{% static 'assets/img/6.PNG' %}" alt="Imagen de referencia Peso Muerto" class="rounded-lg shadow-md w-full h-auto object-cover max-w-[300px]">
+
+                            {# BOTONES Y CAMPO DE ARCHIVO #}
+                            <div class="flex flex-col space-y-2 w-full max-w-[300px]">
+                                <label for="video_ejercicio_peso_muerto" class="block text-center py-2 px-4 rounded-lg border-0 text-sm font-semibold bg-blue-500 text-white hover:bg-blue-600 cursor-pointer transition duration-300 ease-in-out transform hover:scale-105 shadow-md">
+                                    Introducir Video
+                                </label>
+                                <input type="file" name="video_ejercicio_peso_muerto" id="video_ejercicio_peso_muerto" accept="video/*" class="hidden">
+
+                                <button type="button"
+                                        class="w-full py-2 px-4 text-white font-bold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
+                                        style="background-color: #f56565 !important; hover:background-color: #c53030 !important;"> {# CAMBIADO EL COLOR AQUÍ A ROJO CON ESTILO INLINE #}
+                                    Validar Ejercicio
+                                </button>
+                                <div id="video_preview_peso_muerto" class="mt-2 w-full hidden"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Sección de Pecho #}
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-2">Pecho</h2>
+                <div class="space-y-6">
+                    {# Ejercicio 7: Press de Banca #}
+                    <div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
+                        <div class="w-full md:w-1/2">
+                            <h3 class="text-xl font-semibold text-gray-700 mb-2">7.- Press de Banca</h3>
+                            <p class="text-gray-600 text-sm">Ejercicio fundamental para el pecho.</p>
+                        </div>
+                        <div class="w-full md:w-1/2 flex flex-col items-center space-y-4"> {# MODIFICADO #}
+                            <img src="{% static 'assets/img/7.PNG' %}" alt="Imagen de referencia Press de Banca" class="rounded-lg shadow-md w-full h-auto object-cover max-w-[300px]">
+
+                            {# BOTONES Y CAMPO DE ARCHIVO #}
+                            <div class="flex flex-col space-y-2 w-full max-w-[300px]">
+                                <label for="video_ejercicio_press_banca" class="block text-center py-2 px-4 rounded-lg border-0 text-sm font-semibold bg-blue-500 text-white hover:bg-blue-600 cursor-pointer transition duration-300 ease-in-out transform hover:scale-105 shadow-md">
+                                    Introducir Video
+                                </label>
+                                <input type="file" name="video_ejercicio_press_banca" id="video_ejercicio_press_banca" accept="video/*" class="hidden">
+
+                                <button type="button"
+                                        class="w-full py-2 px-4 text-white font-bold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
+                                        style="background-color: #f56565 !important; hover:background-color: #c53030 !important;"> {# CAMBIADO EL COLOR AQUÍ A ROJO CON ESTILO INLINE #}
+                                    Validar Ejercicio
+                                </button>
+                                <div id="video_preview_press_banca" class="mt-2 w-full hidden"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="border-gray-200">
+                    {# Ejercicio 8: Apertura con Mancuerna #}
+                    <div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
+                        <div class="w-full md:w-1/2">
+                            <h2 class="text-xl font-semibold text-gray-700 mb-2">8.- Apertura con Mancuerna</h2>
+                            <p class="text-gray-600 text-sm">Estiramiento y contracción del pecho.</p>
+                        </div>
+                        <div class="w-full md:w-1/2 flex flex-col items-center space-y-4"> {# MODIFICADO #}
+                            <img src="{% static 'assets/img/8.PNG' %}" alt="Imagen de referencia Apertura con Mancuerna" class="rounded-lg shadow-md w-full h-auto object-cover max-w-[300px]">
+
+                            {# BOTONES Y CAMPO DE ARCHIVO #}
+                            <div class="flex flex-col space-y-2 w-full max-w-[300px]">
+                                <label for="video_ejercicio_apertura_mancuerna" class="block text-center py-2 px-4 rounded-lg border-0 text-sm font-semibold bg-blue-500 text-white hover:bg-blue-600 cursor-pointer transition duration-300 ease-in-out transform hover:scale-105 shadow-md">
+                                    Introducir Video
+                                </label>
+                                <input type="file" name="video_ejercicio_apertura_mancuerna" id="video_ejercicio_apertura_mancuerna" accept="video/*" class="hidden">
+
+                                <button type="button"
+                                        class="w-full py-2 px-4 text-white font-bold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
+                                        style="background-color: #f56565 !important; hover:background-color: #c53030 !important;"> {# CAMBIADO EL COLOR AQUÍ A ROJO CON ESTILO INLINE #}
+                                    Validar Ejercicio
+                                </button>
+                                <div id="video_preview_apertura_mancuerna" class="mt-2 w-full hidden"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+    {# FIN DE LAS NUEVAS SECCIONES DE EJERCICIOS #}
 
-    {% include "includes/footer-fullscreen.html" %} {# Si lo tienes en layouts/base.html, puedes quitarlo aquí #}
+    {% include "includes/footer-fullscreen.html" %}
 
 {% endblock content %}
 
 {% block javascripts %}
     {{ block.super }} {# Mantiene los javascripts de layouts/base.html #}
-    <script>
-        function previewVideo(event) {
-            const videoPlayer = document.querySelector('video');
-            const file = event.target.files[0];
-            if (file) {
-                const fileURL = URL.createObjectURL(file);
-                videoPlayer.src = fileURL;
-                videoPlayer.style.display = 'block'; // Asegurarse de que el reproductor sea visible
-                videoPlayer.load(); // Cargar el video para la previsualización
-                videoPlayer.play();
-            } else {
-                videoPlayer.style.display = 'none'; // Ocultar si no hay archivo
-                videoPlayer.src = '';
-            }
-        }
-    </script>
+    {# No se necesita el script previewVideo en esta fase, ya que el campo de subida de video global se eliminó #}
+    {# y las previsualizaciones de video por ejercicio aún no se han implementado #}
 {% endblock javascripts %}
