@@ -1,0 +1,84 @@
+/* Estilos básicos para la página y el contenedor */
+body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f3f4f6; /* bg-gray-100 de Tailwind */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Estilos para la tarjeta simulada */
+.card-mimic {
+    background-color: #ffffff;
+    border-radius: 0.75rem; /* rounded-lg de Tailwind */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md de Tailwind */
+    padding: 1.5rem;
+    width: 100%;
+    max-width: 600px; /* Esto controlará el ancho del gráfico */
+    text-align: center;
+}
+
+.card-header-mimic {
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #e5e7eb; /* border-gray-200 de Tailwind */
+    width: 100%;
+    text-align: left;
+}
+
+/* --- CAMBIO CRUCIAL AQUÍ en .chart-area --- */
+.chart-area {
+    width: 100%;
+    height: 350px; /* <<--- FIJAMOS UNA ALTURA ESPECÍFICA para asegurar que D3 tenga espacio */
+    /* Puedes ajustar este valor (ej. 400px, 300px) según cómo quieres que se vea el gráfico */
+
+    /* Aseguramos que el contenido que D3.js y Chart.js generen ocupen todo este espacio */
+    display: block; /* Asegura que el div no tenga comportamientos flex no deseados con D3/Canvas */
+    overflow: hidden; /* Para que el SVG/Canvas no se desborde */
+}
+
+/* Estilos para el SVG generado por D3.js y el Canvas de Chart.js */
+/* Ahora toman el 100% del ancho y la altura del .chart-area definido arriba */
+.chart-area svg,
+.chart-area canvas {
+    width: 100%;
+    height: 100%;
+    display: block; /* Elimina márgenes extra */
+}
+
+/* Estilos específicos para el SVG de D3.js */
+.axis path,
+.axis line {
+    fill: none;
+    stroke: #cbd5e0; /* stroke-gray-400 de Tailwind */
+    shape-rendering: crispEdges;
+}
+
+.axis text {
+    font-size: 0.875rem; /* text-sm de Tailwind */
+    fill: #4b5563; /* text-gray-700 de Tailwind */
+}
+
+.line {
+    fill: none;
+    stroke: #4A90E2; /* Un azul agradable */
+    stroke-width: 2px;
+}
+
+.dot {
+    fill: #4A90E2; /* Color de los puntos */
+    stroke: #ffffff; /* Borde blanco para los puntos */
+    stroke-width: 1.5px;
+    cursor: pointer; /* Indicar que es clickeable */
+    transition: all 0.2s ease-in-out; /* Transición suave para el resaltado */
+}
+
+.dot.selected {
+    fill: #FF5733; /* Un color de resaltado diferente (naranja/rojo) */
+    stroke: #ffffff;
+    stroke-width: 2.5px;
+    r: 6px; /* Aumentar el radio */
+}

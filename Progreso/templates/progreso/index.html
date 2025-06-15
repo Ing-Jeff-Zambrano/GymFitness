@@ -6,25 +6,466 @@
 {% block stylesheets %}
     {{ block.super }}
     <style>
-      nav.navbar.navbar-top.navbar-dark.bg-primary.border-bottom {
-        background-color: black !important; /* O el color que prefieras */
+      /* --- ESTILOS PARA OCULTAR LA BARRA DE NAVEGACIÓN SUPERIOR (SOLO EN ESTA PÁGINA) --- */
+      .main-content > nav.navbar {
+          display: none !important; /* Oculta la barra de navegación */
+      }
+      /* Ajusta el padding superior del contenido principal para que no quede un espacio vacío */
+      .main-content {
+          padding-top: 0 !important; /* Elimina el padding superior por defecto de Argon */
+      }
+      /* Si tu header principal de la página de progreso tiene un margen superior, ajústalo si es necesario */
+      .header.pb-6 {
+          padding-top: 0 !important; /* Asegura que el header empiece desde arriba si no hay navbar */
+          min-height: 400px; /* Mantener la altura mínima de tu banner */
+      }
+      body {
+          font-family: "Inter", sans-serif; /* Si no lo tienes ya en base.html */
+      }
+      #videoContainer {
+          position: relative;
+          width: 100%; /* Sigue tomando el 100% de su padre, pero ahora con un max-width */
+          padding-top: 54%; /* Mantiene la relación de aspecto 16:9 */
+          background-color: #e2e8f0; /* Color de fondo si el video no carga o hay barras */
+          border-radius: 0.5rem; /* Esquinas redondeadas */
+          overflow: hidden;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Sombra */
+
+          /* --- PROPIEDADES CLAVE PARA HACER EL VIDEO MÁS PEQUEÑO Y CENTRARLO --- */
+          max-width: 500px; /* Limita el ancho máximo del contenedor del video. Puedes ajustar este valor (ej. 350px, 500px, etc.) */
+          margin: 0 auto; /* Centra el contenedor horizontalmente dentro de su espacio disponible */
+      }
+      #videoContainer video {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: contain; /* Asegura que la persona se vea completa (sin recortes de cabeza/pies) */
+          border-radius: 0.5rem; /* Asegura que el video también tenga las esquinas redondeadas */
       }
     </style>
     <link rel="stylesheet" href="{% static 'assets/css/progreso.css' %}">
 {% endblock stylesheets %}
 
 {% block content %}
-    <div class="full-background">
-        <div class="content-wrapper">
-            <h1>Bienvenido a tu Progreso</h1>
-            <h1>{{ request.user.username|upper }}</h1>
-            <p>Aquí podrás ver tu avance y estadísticas.</p>
-            <p>¡Es hora de darle con todo a tu progreso!</p>
-            <a href="#" class="btn-empezar">Empezar</a>
+    <div class="header pb-6 d-flex align-items-center"
+         style="min-height: 400px; background-image: url({% static 'assets/img/theme/profile-cover.jpg' %}); background-size: cover; background-position: center top;">
+        <span class="mask bg-gradient-default opacity-8"></span>
+        <div class="container-fluid d-flex align-items-center">
+            <div class="row">
+                <div class="col-lg-7 col-md-10">
+                    <h1 class="display-3 text-white">
+                        Bienvenido a tu Progreso, {{ request.user.first_name|upper }}!
+                    </h1>
+                    <p class="text-white mt-0 mb-1">
+                        Aquí podrás ver tu avance, estadísticas y la evolución de tus métricas.
+                        ¡Es hora de darlo todo y alcanzar tus metas!
+                    </p>
+                    <a href="{% url 'perfil' %}" class="btn btn-neutral">Registrar Nueva Medición</a>
+                </div>
+            </div>
         </div>
     </div>
-    {% include "includes/footer-fullscreen.html" %}
+
+    <div class="container-fluid mt--7">
+        <div class="row">
+            <!-- Tarjetas de Métricas Clave -->
+            <div class="col-xl-3 col-md-6">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <h5 class="card-title text-uppercase text-muted mb-0">Último Peso</h5>
+                                <span class="h2 font-weight-bold mb-0">
+                                    {% if ultima_medicion.peso %}{{ ultima_medicion.peso|floatformat:1 }} kg{% else %}N/A{% endif %}
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-red text-white rounded-circle shadow">
+                                    <i class="fas fa-weight"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="mt-3 mb-0 text-muted text-sm">
+                            <span class="text-nowrap">
+                                {% if ultima_medicion.fecha_medicion %}
+                                    Última: {{ ultima_medicion.fecha_medicion|date:"d M Y" }}
+                                {% else %}
+                                    Sin registro
+                                {% endif %}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <h5 class="card-title text-uppercase text-muted mb-0">IMC Actual</h5>
+                                <span class="h2 font-weight-bold mb-0">
+                                    {% if imc_ultima_medicion is not None %}
+                                        {{ imc_ultima_medicion|floatformat:1 }}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-orange text-white rounded-circle shadow">
+                                    <i class="fas fa-calculator"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="mt-3 mb-0 text-muted text-sm">
+                            <span class="text-nowrap">
+                                {% if ultima_medicion.peso and ultima_medicion.estatura %}
+                                    (Peso/Estatura²)
+                                {% else %}
+                                    Datos incompletos
+                                {% endif %}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Gráfico de Peso (D3.js) -->
+            <div class="col-xl-6">
+                <div class="card">
+                    <div class="card-header bg-transparent">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h6 class="text-uppercase text-muted ls-1 mb-1">Tu Evolución</h6>
+                                <h5 class="h3 mb-0">Progreso de Peso (kg)</h5>
+                            </div>
+                        </div>
+                        <!-- Elemento para mostrar el peso seleccionado -->
+                        <div class="mt-2 text-xl font-bold text-blue-600" id="selected-weight-display">
+                            <!-- Aquí se mostrará el peso seleccionado. -->
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart" id="weight-chart-container">
+                            {# D3.js insertará el elemento <svg> aquí #}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Sección de Tipo de Cuerpo CON VIDEO DINÁMICO -->
+            <div class="col-xl-6">
+                <div class="card">
+                    <div class="card-header bg-transparent py-3 px-6 border-b border-gray-200"> {# AÑADIR CLASES: py-3 px-6 border-b border-gray-200 #}
+                        <div class="flex items-center justify-between"> {# AÑADIR ESTE DIV #}
+                            <div class="flex-grow"> {# AÑADIR ESTE DIV #}
+                                <h6 class="text-uppercase text-muted text-sm tracking-wide mb-0">Tipo de Cuerpo</h6> {# AÑADIR text-sm tracking-wide, CAMBIAR ls-1 por text-sm tracking-wide, y mb-1 por mb-0 #}
+                                <h5 class="h3 font-bold text-gray-800 mt-1 mb-0"> {# AÑADIR font-bold text-gray-800 mt-1 mb-0 #}
+                                    <span id="displayBodyType"> {# AÑADIR EL SPAN Y SU ID #}
+                                        {% if tipo_cuerpo %}
+                                            {{ tipo_cuerpo|default:"No determinado" }}
+                                        {% else %}
+                                            No determinado
+                                        {% endif %}
+                                    </span>
+                                </h5>
+                            </div> {# CERRAR DIV flex-grow #}
+                        </div> {# CERRAR DIV flex #}
+                    </div>
+                    <!-- Aquí el card-body se ha modificado para incluir el video -->
+                    <div class="card-body p-4 pt-2"> {# CAMBIAR CLASES: p-4 pt-2 #}
+                        <div id="videoContainer">
+                            <!-- El video se cargará aquí dinámicamente con JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de Mediciones Recientes -->
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header border-0">
+                        <h3 class="mb-0">Últimas Mediciones</h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table align-items-center table-flush">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th scope="col">Fecha</th>
+                                    <th scope="col">Peso (kg)</th>
+                                    <th scope="col">Estatura (cm)</th>
+                                    <th scope="col">IMC</th>
+                                    <th scope="col">Tipo de Cuerpo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for medicion in mediciones_recientes %}
+                                <tr>
+                                    <td>{{ medicion.fecha_medicion|date:"d M Y" }}</td>
+                                    <td>{{ medicion.peso|floatformat:1 }}</td>
+                                    <td>{{ medicion.estatura|floatformat:0 }}</td>
+                                    <td>
+                                        {% if medicion.imc_valor is not None %}
+                                            {{ medicion.imc_valor|floatformat:1 }}
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ medicion.tipo_cuerpo }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center">No hay mediciones registradas aún.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% include "includes/footer-fullscreen.html" %}
+    </div>
 {% endblock content %}
 
 {% block javascripts %}
+    {{ block.super }}
+    <!-- D3.js CDN (Necesario para el gráfico de peso) -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <script>
+        // --- DEPURACIÓN: Imprimir JSONs crudos desde Django ---
+        console.log("fechas_pesos_json (D3.js):", '{{ fechas_pesos_json|safe }}');
+        // --- FIN DEPURACIÓN ---
+
+        // Datos pasados desde Django para el gráfico de Peso (D3.js)
+        const dataPeso = JSON.parse('{{ fechas_pesos_json|safe }}');
+
+        console.log("Datos 'dataPeso' para D3.js (parsed):", dataPeso); // Para depuración en la consola
+
+        // --- LÓGICA DEL GRÁFICO DE PESO (D3.js) ---
+        // Este código es para el gráfico de peso usando D3.js
+        // Referencia al elemento donde se mostrará el peso seleccionado en el HTML.
+        const selectedWeightDisplay = document.getElementById('selected-weight-display');
+
+        // Variable para mantener el rastro del punto seleccionado previamente.
+        let previousSelectedDot = null;
+
+        // Configuración de márgenes para el gráfico.
+        const margin = { top: 20, right: 30, bottom: 40, left: 50 };
+
+        // Selecciona el contenedor del gráfico.
+        const container = d3.select("#weight-chart-container");
+
+        // Crea el elemento SVG principal y un grupo (g) para el contenido del gráfico.
+        let svgElement = container.select("svg");
+        if (svgElement.empty()) {
+            svgElement = container.append("svg");
+            svgElement.append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+        }
+        const svg = svgElement.select("g"); // Selecciona el grupo interno para el resto de operaciones
+
+
+        // Analizador de fechas para convertir cadenas de texto a objetos Date.
+        const parseDate = d3.timeParse("%Y-%m-%d");
+
+        // Función para inicializar o redibujar el gráfico.
+        // Se llama al cargar la página y al redimensionar la ventana.
+        function initWeightChart() {
+            // Asegúrate de que el contenedor exista y tenga dimensiones
+            const containerNode = container.node();
+            if (!containerNode) {
+                console.error("Contenedor #weight-chart-container no encontrado.");
+                return;
+            }
+
+            // Si dataPeso no está definida (ej. en caso de error de Django), se puede salir temprano
+            if (typeof dataPeso === 'undefined' || dataPeso.length === 0) {
+                selectedWeightDisplay.textContent = "No hay datos de peso disponibles para mostrar.";
+                // Limpia el SVG si no hay datos
+                svgElement.html('');
+                return; // Salir de la función si no hay datos
+            }
+
+            // Prepara los datos: convierte fechas a objetos Date y pesos a números.
+            dataPeso.forEach(d => {
+                d.fecha = parseDate(d.fecha);
+                d.peso = +d.peso; // El signo + convierte la cadena a número.
+            });
+
+            // Recalcula las dimensiones del gráfico basándose en el tamaño actual del contenedor.
+            const containerRect = containerNode.getBoundingClientRect();
+            let width = containerRect.width - margin.left - margin.right;
+            let height = containerRect.height - margin.top - margin.bottom;
+
+            // --- DEPURACIÓN CLAVE: Muestra las dimensiones calculadas ---
+            console.log("D3.js: Dimensiones calculadas (width, height) para el gráfico:", width, height);
+            // Si width o height son <= 0, el gráfico no se dibujará.
+            if (width <= 0 || height <= 0) {
+                console.warn("D3.js: Las dimensiones del contenedor son insuficientes para dibujar el gráfico. Width:", width, "Height:", height);
+                selectedWeightDisplay.textContent = "El espacio del gráfico es muy pequeño para mostrarlo.";
+                svgElement.html(''); // Oculta el SVG si no puede dibujarse
+                return; // Salir de la función si las dimensiones son inválidas
+            }
+
+
+            // Actualiza los atributos 'width' y 'height' del elemento SVG principal.
+            svgElement.attr("width", width + margin.left + margin.right);
+            svgElement.attr("height", height + margin.top + margin.bottom);
+
+            // Actualiza la transformación del grupo principal
+            svg.attr("transform", `translate(${margin.left},${margin.top})`);
+
+
+            // Configura la escala para el eje X (tiempo).
+            const xScale = d3.scaleTime()
+                .domain(d3.extent(dataPeso, d => d.fecha)) // Rango de fechas de los datos.
+                .range([0, width]); // Mapea el rango de fechas al ancho del gráfico.
+
+            // Configura la escala para el eje Y (peso).
+            const yScale = d3.scaleLinear()
+                .domain([d3.min(dataPeso, d => d.peso) - 1, d3.max(dataPeso, d => d.peso) + 1]) // Rango de peso con un pequeño margen.
+                .range([height, 0]); // Mapea el rango de peso a la altura del gráfico (invertido para Y).
+
+            // Define el generador de línea D3.
+            const lineGenerator = d3.line()
+                .x(d => xScale(d.fecha)) // Posición X de cada punto basada en la fecha.
+                .y(d => yScale(d.peso)) // Posición Y de cada punto basada en el peso.
+                .curve(d3.curveMonotoneX); // Suaviza la línea entre los puntos.
+
+            // Selecciona la ruta de la línea y la actualiza o la crea si no existe.
+            const path = svg.selectAll(".line").data([dataPeso]);
+            path.enter().append("path")
+                .attr("class", "line") // Asigna la clase CSS 'line'.
+                .merge(path) // Fusiona los elementos existentes con los nuevos.
+                .attr("d", lineGenerator); // Genera la ruta SVG para la línea.
+
+            // Selecciona los círculos (puntos de datos) y los actualiza o los crea.
+            const dots = svg.selectAll(".dot").data(dataPeso);
+            dots.enter().append("circle")
+                .attr("class", "dot") // Asigna la clase CSS 'dot'.
+                .merge(dots) // Fusiona los elementos existentes con los nuevos.
+                .attr("cx", d => xScale(d.fecha)) // Posición X del círculo.
+                .attr("cy", d => yScale(d.peso)) // Posición Y del círculo.
+                .attr("r", 4) // Radio por defecto del círculo.
+                .on("click", function(event, d) { // Añade un evento de clic a cada punto.
+                    // Si hay un punto previamente seleccionado, le quita el estilo de resaltado.
+                    if (previousSelectedDot) {
+                        d3.select(previousSelectedDot)
+                            .attr("class", "dot"); // Vuelve a la clase CSS 'dot' por defecto.
+                    }
+
+                    // Resalta el punto clickeado añadiéndole la clase 'selected'.
+                    d3.select(this)
+                        .attr("class", "dot selected");
+
+                    // Almacena la referencia del punto clickeado como el 'previousSelectedDot'.
+                    previousSelectedDot = this;
+
+                    // Muestra el peso y la fecha del punto seleccionado en el elemento HTML.
+                    selectedWeightDisplay.textContent = `Peso: ${d.peso} kg (${d3.timeFormat("%d/%m/%Y")(d.fecha)})`;
+                });
+            dots.exit().remove(); // Elimina cualquier punto que ya no esté en los datos.
+
+            // Dibuja el eje X.
+            const xAxis = svg.selectAll(".x.axis").data([null]); // Solo un eje X.
+            xAxis.enter().append("g")
+                .attr("class", "x axis") // Asigna la clase CSS 'x axis'.
+                .merge(xAxis) // Fusiona y actualiza el eje existente.
+                .attr("transform", `translate(0,${height})`) // Coloca el eje en la parte inferior del gráfico.
+                .call(d3.axisBottom(xScale).tickFormat(d3.timeFormat("%b %Y"))); // Formato de fecha para las etiquetas del eje X.
+
+            // Dibuja el eje Y.
+            const yAxis = svg.selectAll(".y.axis").data([null]); // Solo un eje Y.
+            yAxis.enter().append("g")
+                .attr("class", "y axis") // Asigna la clase CSS 'y axis'.
+                .merge(yAxis) // Fusiona y actualiza el eje existente.
+                .call(d3.axisLeft(yScale)); // Dibuja el eje Y con la escala correspondiente.
+        }
+
+        // Llama a la función initWeightChart cuando la ventana ha cargado completamente.
+        document.addEventListener('DOMContentLoaded', function() {
+            initWeightChart();
+        });
+
+
+        // Añade un listener para redibujar el gráfico de peso cada vez que la ventana se redimensiona.
+        window.addEventListener('resize', initWeightChart);
+
+        // Mensaje inicial en el display de peso (puede ser sobreescrito por initWeightChart)
+        selectedWeightDisplay.textContent = "Haz clic en un punto para ver el peso.";
+
+    // Define la URL base para las imágenes estáticas desde Django
+        // Esta línea es crucial para que Django sirva correctamente los videos desde tu carpeta 'static'
+        const staticImgBaseUrl = "{% static 'assets/img/' %}";
+
+        // --- LÓGICA DEL VIDEO DINÁMICO POR TIPO DE CUERPO ---
+        // Obtenemos referencias a los elementos HTML
+        const videoContainer = document.getElementById('videoContainer');
+        const displayBodyTypeSpan = document.getElementById('displayBodyType'); // Ya existe en tu HTML, pero útil si quieres actualizarlo con JS
+
+        // Obtenemos el tipo de cuerpo desde el template Jinja.
+        // Asegúrate de que el valor en Jinja esté en minúsculas para que coincida con el nombre del archivo del video.
+        // Por ejemplo, si tipo_cuerpo es "Ectomorfo", aquí se convierte a "ectomorfo".
+        const initialBodyType = "{{ tipo_cuerpo|default:'ectomorfo' | lower }}";
+
+        /**
+         * Carga y reproduce el video correspondiente al tipo de cuerpo.
+         * @param {string} bodyType - El tipo de cuerpo (ej. 'ectomorfo', 'mesomorfo', 'endomorfo').
+         */
+        function loadVideo(bodyType) {
+            // Limpiamos cualquier contenido previo en el contenedor de video
+            videoContainer.innerHTML = '';
+
+            // Si el tipo de cuerpo es "No determinado" o vacío, no cargamos un video, mostramos un mensaje.
+            if (!bodyType || bodyType === 'no determinado') {
+                videoContainer.innerHTML = `
+                    <div class="flex items-center justify-center h-full text-gray-500 text-center p-4">
+                        <p>Tipo de cuerpo no determinado.<br>No hay video disponible.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Creamos un nuevo elemento de video
+            const videoElement = document.createElement('video');
+            // Usamos la variable staticImgBaseUrl para construir la ruta completa al video
+            videoElement.src = `${staticImgBaseUrl}${bodyType}.mp4`;
+            videoElement.autoplay = true;     // Reproducción automática
+            videoElement.loop = true;         // Reproducción en bucle
+            videoElement.muted = true;        // Silenciar el video (necesario para autoplay en muchos navegadores)
+            videoElement.playsinline = true;  // Asegura que se reproduzca en línea en dispositivos móviles (iOS)
+
+            // Añadimos clases para estilizado y para que el video llene el contenedor correctamente
+            // Estas clases corresponden a los estilos CSS que añadimos en el <style>
+            videoElement.classList.add('absolute', 'top-0', 'left-0', 'w-full', 'h-full', 'object-contain', 'rounded-lg', 'shadow-inner');
+
+            // Manejamos el caso donde el video no se puede cargar (ej. archivo no encontrado)
+            videoElement.onerror = () => {
+                videoContainer.innerHTML = `
+                    <div class="flex items-center justify-center h-full text-gray-500 text-center p-4">
+                        <p>Error: No se pudo cargar el video para ${bodyType}.<br>Verifica la ruta y el formato (ej. ectomorfo.mp4).</p>
+                    </div>
+                `;
+                console.error(`Error al cargar el video: ${staticImgBaseUrl}${bodyType}.mp4`);
+            };
+
+            // Añadimos el video al contenedor div#videoContainer
+            videoContainer.appendChild(videoElement);
+        }
+
+        // Llama a la función loadVideo cuando el DOM ha cargado completamente.
+        // Asegúrate de que esto se ejecuta después de que initWeightChart() si el orden importa.
+        document.addEventListener('DOMContentLoaded', function() {
+            // initWeightChart(); // Ya debería estar aquí si tu D3.js funciona
+            loadVideo(initialBodyType); // Inicializa el video del tipo de cuerpo
+        });
+    </script>
 {% endblock javascripts %}

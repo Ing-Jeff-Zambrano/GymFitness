@@ -1,391 +1,446 @@
 {% extends 'layouts/base.html' %}
+{% load static %}
 
 {% block title %} Dashboard {% endblock title %}
 
-{% block stylesheets %}{% endblock stylesheets %}
+{% block stylesheets %}
+    {{ block.super }}
+    {# Carga tu CSS de progreso, que ahora contendrá los estilos para el gráfico D3.js #}
+    <link rel="stylesheet" href="{% static 'assets/css/progreso.css' %}">
+
+    <style>
+      /* --- ESTILOS ESPECÍFICOS PARA EL VIDEO EN EL DASHBOARD --- */
+      /* Ajustes de fuente para Inter (si no está ya globalmente en base.html) */
+      body {
+          font-family: "Inter", sans-serif;
+      }
+      /* Contenedor del video para mantener la relación de aspecto y estilizado */
+      #videoContainerDashboard { /* Usamos un ID diferente para evitar conflictos con progreso.html */
+          position: relative;
+          width: 100%; /* Ocupa el 100% del ancho de su padre (que será el max-width que definamos) */
+          padding-top: 75%; /* Relación de aspecto 16:9 (9 / 16 = 0.5625) */
+          background-color: #e2e8f0; /* Color de fondo si el video no carga o hay barras */
+          border-radius: 0.5rem; /* Esquinas redondeadas */
+          overflow: hidden;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Sombra */
+
+          /* --- PROPIEDADES PARA CONTROLAR EL TAMAÑO Y CENTRAR EL VIDEO DENTRO DEL col-xl-4 --- */
+          /* Limita el ancho máximo del contenedor. Ajusta este valor en px o rem según necesites.
+             Dado que es un col-xl-4, un max-width como 250px o 300px podría ser apropiado.
+             O si prefieres, puedes usar max-w-xs, max-w-sm (clases de Tailwind) si no quieres pixel exacto aquí. */
+          max-width: 440px; /* Un valor inicial, ajústalo según necesites para el col-xl-4 */
+          margin: 0 auto; /* Centra el contenedor horizontalmente dentro de su espacio disponible */
+      }
+      /* El video en sí, para que ocupe todo el contenedor #videoContainerDashboard */
+      #videoContainerDashboard video {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: contain; /* Asegura que la persona se vea completa (sin recortes de cabeza/pies) */
+          border-radius: 0.5rem; /* Asegura que el video también tenga las esquinas redondeadas */
+      }
+    </style>
+{% endblock stylesheets %}
 
 {% block content %}
 
-    <div class="header bg-primary pb-6">
-      <div class="container-fluid">
-        <div class="header-body">
-          <div class="row align-items-center py-4">
-            <div class="col-lg-6 col-7">
-              <h6 class="h2 text-white d-inline-block mb-0">Default</h6>
-              <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
-                <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
-                  <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
-                  <li class="breadcrumb-item"><a href="#">Dashboards</a></li>
-                  <li class="breadcrumb-item active" aria-current="page">Default</li>
-                </ol>
-              </nav>
-            </div>
-
-          </div>
-          <div class="row">
-            <div class="col-xl-3 col-md-6">
-              <div class="card card-stats">
-                <div class="card-body">
-                  <div class="row">
-                    <div class="col">
-                      <h5 class="card-title text-uppercase text-muted mb-0">Usuario Actual</h5>
-                      <span class="h2 font-weight-bold mb-0">{{ request.user.username|upper }}</span>
+    <div class="header bg-primary pb-6"> {# Este div se mantiene morado #}
+        <div class="container-fluid">
+            <div class="header-body">
+                <div class="row align-items-center py-4">
+                    <div class="col-lg-6 col-7">
+                        <h6 class="h2 text-white d-inline-block mb-0">Default</h6>
+                        <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                            <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                                <li class="breadcrumb-item"><a href="#" class="text-primary"><i class="fas fa-home"></i></a></li>
+                                <li class="breadcrumb-item"><a href="#" class="text-primary">Dashboards</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">Default</li>
+                            </ol>
+                        </nav>
                     </div>
-                    <div class="col-auto">
-                      <div class="icon icon-shape bg-gradient-red text-white rounded-circle shadow">
-                        <i class="ni ni-single-02"></i>
-                      </div>
-                    </div>
-                  </div>
-
                 </div>
-              </div>
-            </div>
-            <div class="col-xl-3 col-md-6">
-              <div class="card card-stats">
-                <div class="card-body">
-                  <div class="row">
-                    <div class="col">
-                      <h5 class="card-title text-uppercase text-muted mb-0">Tipo de Cuerpo</h5>
-                      <span class="h2 font-weight-bold mb-0">
-                        {% if tipo_cuerpo %}
-                          {{ tipo_cuerpo|default:"No determinado" }}
-                        {% else %}
-                          No determinado
-                        {% endif %}
-                      </span>
+                <div class="row d-flex justify-content-around">
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card card-stats">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="card-title text-uppercase text-muted mb-0">Usuario Actual</h5>
+                                        <span class="h2 font-weight-bold mb-0">{{ request.user.username|upper }}</span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon icon-shape bg-gradient-red text-white rounded-circle shadow">
+                                            <i class="ni ni-single-02"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-auto">
-                      <div class="icon icon-shape bg-gradient-orange text-white rounded-circle shadow">
-                        <i class="ni ni-body-1"></i>
-                      </div>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card card-stats">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="card-title text-uppercase text-muted mb-0">Tipo de Cuerpo</h5>
+                                        <span class="h2 font-weight-bold mb-0">
+                                            {% if tipo_cuerpo %}
+                                                <span id="displayBodyTypeDashboard">{{ tipo_cuerpo|default:"No determinado" }}</span> {# ID para JS #}
+                                            {% else %}
+                                                <span id="displayBodyTypeDashboard">No determinado</span>
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon icon-shape bg-gradient-green text-white rounded-circle shadow">
+                                            <i class="fas fa-male"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                  </div>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card card-stats">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="card-title text-uppercase text-muted mb-0">Progreso</h5>
+                                        <span class="h2 font-weight-bold mb-0">Balanceado</span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon icon-shape bg-gradient-blue text-white rounded-circle shadow">
+                                            <!-- Icono de Font Awesome que representa un gráfico de línea, ideal para progreso -->
+                                            <i class="fas fa-chart-line"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-            <div class="col-xl-3 col-md-6">
-              <div class="card card-stats">
-                <div class="card-body">
-                  <div class="row">
-                    <div class="col">
-                      <h5 class="card-title text-uppercase text-muted mb-0">Progreso</h5>
-                      <span class="h2 font-weight-bold mb-0">Balanceado</span>
-                    </div>
-                    <div class="col-auto">
-                      <div class="icon icon-shape bg-gradient-green text-white rounded-circle shadow">
-                        <i class="ni ni-trophy"></i>
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-            </div>
-            <div class="col-xl-3 col-md-6">
-              <div class="card card-stats">
-                <div class="card-body">
-                  <div class="row">
-                    <div class="col">
-                      <h5 class="card-title text-uppercase text-muted mb-0">Nutricion</h5>
-                      <span class="h2 font-weight-bold mb-0">Balanceada</span>
-                    </div>
-                    <div class="col-auto">
-                      <div class="icon icon-shape bg-gradient-info text-white rounded-circle shadow">
-                        <i class="ni ni-chart-pie-35"></i>
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
-      </div>
     </div>
+
 
     <div class="container-fluid mt--6">
-      <div class="row">
-        <div class="col-xl-8">
-          <div class="card bg-default">
-            <div class="card-header bg-transparent">
-              <div class="row align-items-center">
-                <div class="col">
-                  <h6 class="text-light text-uppercase ls-1 mb-1">Overview</h6>
-                  <h5 class="h3 text-white mb-0">Sales value</h5>
+        <div class="row">
+            {# CAMBIO AQUÍ: Eliminado bg-default y ajustados colores de texto #}
+            <div class="col-xl-8">
+                <div class="card"> {# Removido bg-default #}
+                    <div class="card-header bg-transparent">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                {# Texto ahora oscuro para contraste con fondo blanco #}
+                                <h6 class="text-uppercase text-muted ls-1 mb-1">Tu Evolución</h6>
+                                <h5 class="h3 mb-0">Progreso de Peso (kg)</h5> {# H3 por defecto es oscuro #}
+                            </div>
+                            <div class="col">
+                                {# Elemento para mostrar el peso seleccionado en el dashboard #}
+                                <div class="mt-2 text-xl font-bold text-blue-600 text-right" id="selected-weight-display-dashboard">
+                                    <!-- Aquí se mostrará el peso seleccionado. -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart" id="weight-chart-container-dashboard">
+                            {# D3.js insertará el elemento <svg> aquí #}
+                        </div>
+                    </div>
                 </div>
-                <div class="col">
-                  <ul class="nav nav-pills justify-content-end">
-                    <li class="nav-item mr-2 mr-md-0" data-toggle="chart" data-target="#chart-sales-dark" data-update='{"data":{"datasets":[{"data":[0, 20, 10, 30, 15, 40, 20, 60, 60]}]}}' data-prefix="$" data-suffix="k">
-                      <a href="#" class="nav-link py-2 px-3 active" data-toggle="tab">
-                        <span class="d-none d-md-block">Month</span>
-                        <span class="d-md-none">M</span>
-                      </a>
-                    </li>
-                    <li class="nav-item" data-toggle="chart" data-target="#chart-sales-dark" data-update='{"data":{"datasets":[{"data":[0, 20, 5, 25, 10, 30, 15, 40, 40]}]}}' data-prefix="$" data-suffix="k">
-                      <a href="#" class="nav-link py-2 px-3" data-toggle="tab">
-                        <span class="d-none d-md-block">Week</span>
-                        <span class="d-md-none">W</span>
-                      </a>
-                    </li>
-                  </ul>
+            </div>
+            {# MODIFICACIÓN DE LA SECCIÓN DE TIPO DE CUERPO PARA EL VIDEO #}
+            <div class="col-xl-4">
+                <div class="card">
+                    <div class="card-header bg-transparent py-3 px-6 border-b border-gray-200"> {# Añadimos estas clases para consistencia #}
+                        <div class="flex items-center justify-between">
+                            <div class="flex-grow">
+                                <h6 class="text-uppercase text-muted text-sm tracking-wide mb-0">Tu Tipo de Cuerpo</h6> {# Ajustamos clases #}
+                                <h5 class="h3 font-bold text-gray-800 mt-1 mb-0"> {# Ajustamos clases #}
+                                    <span id="displayBodyTypeDashboard"> {# Usamos el ID del span en la tarjeta de arriba para consistencia #}
+                                        {% if tipo_cuerpo %}
+                                            {{ tipo_cuerpo|default:"No determinado" }}
+                                        {% else %}
+                                            No determinado
+                                        {% endif %}
+                                    </span>
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-4 pt-2"> {# Ajustamos padding para consistencia #}
+                        {# Aquí irá el contenedor del video #}
+                        <div id="videoContainerDashboard">
+                            <!-- El video se cargará aquí dinámicamente con JavaScript -->
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-            <div class="card-body">
-              <div class="chart">
-                <canvas id="chart-sales-dark" class="chart-canvas"></canvas>
-              </div>
-            </div>
-          </div>
+            {# FIN DE LA MODIFICACIÓN DE LA SECCIÓN DE TIPO DE CUERPO #}
         </div>
-        <div class="col-xl-4">
-          <div class="card">
-            <div class="card-header bg-transparent">
-              <div class="row align-items-center">
-                <div class="col">
-                  <h6 class="text-uppercase text-muted ls-1 mb-1">Performance</h6>
-                  <h5 class="h3 mb-0">Total orders</h5>
-                </div>
-              </div>
-            </div>
-            <div class="card-body">
-              <div class="chart">
-                <canvas id="chart-bars" class="chart-canvas"></canvas>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-xl-8">
-          <div class="card">
-            <div class="card-header border-0">
-              <div class="row align-items-center">
-                <div class="col">
-                  <h3 class="mb-0">Page visits</h3>
-                </div>
-                <div class="col text-right">
-                  <a href="#!" class="btn btn-sm btn-primary">See all</a>
-                </div>
-              </div>
-            </div>
-            <div class="table-responsive">
-              <table class="table align-items-center table-flush">
-                <thead class="thead-light">
-                  <tr>
-                    <th scope="col">Page name</th>
-                    <th scope="col">Visitors</th>
-                    <th scope="col">Unique users</th>
-                    <th scope="col">Bounce rate</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">
-                      /argon/
-                    </th>
-                    <td>
-                      4,569
-                    </td>
-                    <td>
-                      340
-                    </td>
-                    <td>
-                      <i class="fas fa-arrow-up text-success mr-3"></i> 46,53%
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">
-                      /argon/index.html
-                    </th>
-                    <td>
-                      3,985
-                    </td>
-                    <td>
-                      319
-                    </td>
-                    <td>
-                      <i class="fas fa-arrow-down text-warning mr-3"></i> 46,53%
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">
-                      /argon/charts.html
-                    </th>
-                    <td>
-                      3,513
-                    </td>
-                    <td>
-                      294
-                    </td>
-                    <td>
-                      <i class="fas fa-arrow-down text-warning mr-3"></i> 36,49%
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">
-                      /argon/tables.html
-                    </th>
-                    <td>
-                      2,050
-                    </td>
-                    <td>
-                      147
-                    </td>
-                    <td>
-                      <i class="fas fa-arrow-up text-success mr-3"></i> 50,87%
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">
-                      /argon/profile.html
-                    </th>
-                    <td>
-                      1,795
-                    </td>
-                    <td>
-                      190
-                    </td>
-                    <td>
-                      <i class="fas fa-arrow-down text-danger mr-3"></i> 46,53%
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-        <div class="col-xl-4">
-          <div class="card">
-            <div class="card-header border-0">
-              <div class="row align-items-center">
-                <div class="col">
-                  <h3 class="mb-0">Social traffic</h3>
-                </div>
-                <div class="col text-right">
-                  <a href="#!" class="btn btn-sm btn-primary">See all</a>
-                </div>
-              </div>
-            </div>
-            <div class="table-responsive">
-              <table class="table align-items-center table-flush">
-                <thead class="thead-light">
-                  <tr>
-                    <th scope="col">Referral</th>
-                    <th scope="col">Visitors</th>
-                    <th scope="col"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">
-                      Facebook
-                    </th>
-                    <td>
-                      1,480
-                    </td>
-                    <td>
-                      <div class="d-flex align-items-center">
-                        <span class="mr-2">60%</span>
-                        <div>
-                          <div class="progress">
-                            <div class="progress-bar bg-gradient-danger" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;"></div>
-                          </div>
+        <div class="row">
+            {# INICIO DEL DIV MODIFICADO: col-xl-8 con la tabla de Últimas Mediciones #}
+            <div class="col-xl-8">
+                <div class="card">
+                    <div class="card-header border-0">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h3 class="mb-0">Últimas Mediciones</h3> {# Título de la tabla #}
+                            </div>
+                            <div class="col text-right">
+                                {# Enlace a la página de progreso usando el nombre de URL correcto #}
+                                <a href="{% url 'progreso:progreso_home' %}" class="btn btn-sm btn-primary">Ver todas</a>
+                            </div>
                         </div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">
-                      Facebook
-                    </th>
-                    <td>
-                      5,480
-                    </td>
-                    <td>
-                      <div class="d-flex align-items-center">
-                        <span class="mr-2">70%</span>
-                        <div>
-                          <div class="progress">
-                            <div class="progress-bar bg-gradient-success" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" style="width: 70%;"></div>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">
-                      Google
-                    </th>
-                    <td>
-                      4,807
-                    </td>
-                    <td>
-                      <div class="d-flex align-items-center">
-                        <span class="mr-2">80%</span>
-                        <div>
-                          <div class="progress">
-                            <div class="progress-bar bg-gradient-primary" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style="width: 80%;"></div>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">
-                      Instagram
-                    </th>
-                    <td>
-                      3,678
-                    </td>
-                    <td>
-                      <div class="d-flex align-items-center">
-                        <span class="mr-2">75%</span>
-                        <div>
-                          <div class="progress">
-                            <div class="progress-bar bg-gradient-info" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 75%;"></div>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">
-                      twitter
-                    </th>
-                    <td>
-                      2,645
-                    </td>
-                    <td>
-                      <div class="d-flex align-items-center">
-                        <span class="mr-2">30%</span>
-                        <div>
-                          <div class="progress">
-                            <div class="progress-bar bg-gradient-warning" role="progressbar" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100" style="width: 30%;"></div>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table align-items-center table-flush">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th scope="col">Fecha y Hora</th>
+                                    <th scope="col">Peso (kg)</th>
+                                    <th scope="col">Estatura (cm)</th>
+                                    <th scope="col">IMC</th>
+                                    <th scope="col">Tipo de Cuerpo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {# Aquí se poblarán las mediciones recientes desde la vista #}
+                                {% for medicion in mediciones_recientes %}
+                                <tr>
+                                    <td>{{ medicion.fecha_medicion|date:"d M Y H:i" }}</td>
+                                    <td>{{ medicion.peso|floatformat:1 }}</td>
+                                    <td>{{ medicion.estatura|floatformat:0 }}</td>
+                                    <td>
+                                        {% if medicion.imc_valor is not None %}
+                                            {{ medicion.imc_valor|floatformat:1 }}
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ medicion.tipo_cuerpo }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center">No hay mediciones registradas aún.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
+            {# FIN DEL DIV MODIFICADO #}
 
-      {% include "includes/footer-fullscreen.html" %}
-
+        </div>
     </div>
+
+    {% include "includes/footer-fullscreen.html" %}
 
 {% endblock content %}
 
 {% block javascripts %}
+  {{ block.super }}
+  <!-- D3.js CDN (Necesario para el gráfico de peso en el dashboard) -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
 
+  <!-- Tus scripts originales de Chart.js (si los necesitas para otros gráficos de Chart.js en el dashboard) -->
   <script src="/static/assets/vendor/chart.js/dist/Chart.min.js"></script>
   <script src="/static/assets/vendor/chart.js/dist/Chart.extension.js"></script>
 
+  <script>
+    // Define la URL base para las imágenes estáticas desde Django
+    const staticImgBaseUrl = "{% static 'assets/img/' %}";
+
+    // Datos pasados desde Django para el gráfico de Peso (D3.js) en el dashboard
+    const dataPesoDashboard = JSON.parse('{{ fechas_pesos_json_dashboard|safe }}');
+
+    console.log("Datos 'dataPesoDashboard' para D3.js (parsed):", dataPesoDashboard); // Para depuración
+
+    // --- LÓGICA DEL GRÁFICO DE PESO (D3.js) para el DASHBOARD ---
+    // Referencia al elemento donde se mostrará el peso seleccionado en el HTML.
+    const selectedWeightDisplayDashboard = document.getElementById('selected-weight-display-dashboard');
+
+    // Variable para mantener el rastro del punto seleccionado previamente.
+    let previousSelectedDotDashboard = null; // Usar nombre diferente para evitar conflictos si existe otro
+
+    // Configuración de márgenes para el gráfico.
+    const marginDashboard = { top: 20, right: 30, bottom: 40, left: 50 };
+
+    // Selecciona el contenedor del gráfico.
+    const containerDashboard = d3.select("#weight-chart-container-dashboard");
+
+    // Crea el elemento SVG principal y un grupo (g) para el contenido del gráfico.
+    let svgElementDashboard = containerDashboard.select("svg");
+    if (svgElementDashboard.empty()) {
+        svgElementDashboard = containerDashboard.append("svg");
+        svgElementDashboard.append("g")
+            .attr("transform", `translate(${marginDashboard.left},${marginDashboard.top})`);
+    }
+    const svgDashboard = svgElementDashboard.select("g"); // Selecciona el grupo interno para el resto de operaciones
+
+
+    // Analizador de fechas para convertir cadenas de texto a objetos Date.
+    const parseDateDashboard = d3.timeParse("%Y-%m-%d");
+
+    // Función para inicializar o redibujar el gráfico en el dashboard.
+    function initWeightChartDashboard() {
+        const containerNodeDashboard = containerDashboard.node();
+        if (!containerNodeDashboard) {
+            console.error("Contenedor #weight-chart-container-dashboard no encontrado.");
+            return;
+        }
+
+        if (typeof dataPesoDashboard === 'undefined' || dataPesoDashboard.length === 0) {
+            selectedWeightDisplayDashboard.textContent = "No hay datos de peso disponibles para mostrar.";
+            svgElementDashboard.html('');
+            return;
+        }
+
+        dataPesoDashboard.forEach(d => {
+            d.fecha = parseDateDashboard(d.fecha);
+            d.peso = +d.peso;
+        });
+
+        const containerRectDashboard = containerNodeDashboard.getBoundingClientRect();
+        let widthDashboard = containerRectDashboard.width - marginDashboard.left - marginDashboard.right;
+        let heightDashboard = containerRectDashboard.height - marginDashboard.top - marginDashboard.bottom;
+
+        console.log("D3.js Dashboard: Dimensiones calculadas (width, height) para el gráfico:", widthDashboard, heightDashboard);
+
+        if (widthDashboard <= 0 || heightDashboard <= 0) {
+            console.warn("D3.js Dashboard: Las dimensiones del contenedor son insuficientes para dibujar el gráfico. Width:", widthDashboard, "Height:", heightDashboard);
+            selectedWeightDisplayDashboard.textContent = "El espacio del gráfico es muy pequeño para mostrarlo.";
+            svgElementDashboard.html('');
+            return;
+        }
+
+        svgElementDashboard.attr("width", widthDashboard + marginDashboard.left + marginDashboard.right);
+        svgElementDashboard.attr("height", heightDashboard + marginDashboard.top + marginDashboard.bottom);
+        svgDashboard.attr("transform", `translate(${marginDashboard.left},${marginDashboard.top})`);
+
+        const xScaleDashboard = d3.scaleTime()
+            .domain(d3.extent(dataPesoDashboard, d => d.fecha))
+            .range([0, widthDashboard]);
+
+        const yScaleDashboard = d3.scaleLinear()
+            .domain([d3.min(dataPesoDashboard, d => d.peso) - 1, d3.max(dataPesoDashboard, d => d.peso) + 1])
+            .range([heightDashboard, 0]);
+
+        const lineGeneratorDashboard = d3.line()
+            .x(d => xScaleDashboard(d.fecha))
+            .y(d => yScaleDashboard(d.peso))
+            .curve(d3.curveMonotoneX);
+
+        const pathDashboard = svgDashboard.selectAll(".line").data([dataPesoDashboard]);
+        pathDashboard.enter().append("path")
+            .attr("class", "line")
+            .merge(pathDashboard)
+            .attr("d", lineGeneratorDashboard);
+
+        const dotsDashboard = svgDashboard.selectAll(".dot").data(dataPesoDashboard);
+        dotsDashboard.enter().append("circle")
+            .attr("class", "dot")
+            .merge(dotsDashboard)
+            .attr("cx", d => xScaleDashboard(d.fecha))
+            .attr("cy", d => yScaleDashboard(d.peso))
+            .attr("r", 4)
+            .on("click", function(event, d) {
+                if (previousSelectedDotDashboard) {
+                    d3.select(previousSelectedDotDashboard).attr("class", "dot");
+                }
+                d3.select(this).attr("class", "dot selected");
+                previousSelectedDotDashboard = this;
+                selectedWeightDisplayDashboard.textContent = `Peso: ${d.peso} kg (${d3.timeFormat("%d/%m/%Y")(d.fecha)})`;
+            });
+        dotsDashboard.exit().remove();
+
+        const xAxisDashboard = svgDashboard.selectAll(".x.axis").data([null]);
+        xAxisDashboard.enter().append("g")
+            .attr("class", "x axis")
+            .merge(xAxisDashboard)
+            .attr("transform", `translate(0,${heightDashboard})`)
+            .call(d3.axisBottom(xScaleDashboard).tickFormat(d3.timeFormat("%b %Y")));
+
+        const yAxisDashboard = svgDashboard.selectAll(".y.axis").data([null]);
+        yAxisDashboard.enter().append("g")
+            .attr("class", "y axis")
+            .merge(yAxisDashboard)
+            .call(d3.axisLeft(yScaleDashboard));
+    }
+
+    // --- LÓGICA DEL VIDEO DINÁMICO POR TIPO DE CUERPO para el DASHBOARD ---
+    // Obtenemos referencias a los elementos HTML
+    const videoContainerDashboard = document.getElementById('videoContainerDashboard');
+    const displayBodyTypeSpanDashboard = document.getElementById('displayBodyTypeDashboard');
+
+    // Obtenemos el tipo de cuerpo desde el template Jinja.
+    const initialBodyTypeDashboard = "{{ tipo_cuerpo|default:'ectomorfo' | lower }}";
+
+    /**
+     * Carga y reproduce el video correspondiente al tipo de cuerpo en el dashboard.
+     * @param {string} bodyType - El tipo de cuerpo (ej. 'ectomorfo', 'mesomorfo', 'endomorfo').
+     */
+    function loadVideoDashboard(bodyType) {
+        if (!videoContainerDashboard) {
+            console.error("Contenedor #videoContainerDashboard no encontrado.");
+            return;
+        }
+
+        // Limpiamos cualquier contenido previo en el contenedor de video
+        videoContainerDashboard.innerHTML = '';
+
+        // Si el tipo de cuerpo es "No determinado" o vacío, no cargamos un video, mostramos un mensaje.
+        if (!bodyType || bodyType === 'no determinado') {
+            videoContainerDashboard.innerHTML = `
+                <div class="flex items-center justify-center h-full text-gray-500 text-center p-4">
+                    <p>Tipo de cuerpo no determinado.<br>No hay video disponible.</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Creamos un nuevo elemento de video
+        const videoElement = document.createElement('video');
+        // Usamos la variable staticImgBaseUrl para construir la ruta completa al video
+        videoElement.src = `${staticImgBaseUrl}${bodyType}.mp4`;
+        videoElement.autoplay = true;     // Reproducción automática
+        videoElement.loop = true;         // Reproducción en bucle
+        videoElement.muted = true;        // Silenciar el video (necesario para autoplay en muchos navegadores)
+        videoElement.playsinline = true;  // Asegura que se reproduzca en línea en dispositivos móviles (iOS)
+
+        // Añadimos clases para estilizado y para que el video llene el contenedor correctamente
+        videoElement.classList.add('absolute', 'top-0', 'left-0', 'w-full', 'h-full', 'object-contain', 'rounded-lg', 'shadow-inner');
+
+        // Manejamos el caso donde el video no se puede cargar (ej. archivo no encontrado)
+        videoElement.onerror = () => {
+            videoContainerDashboard.innerHTML = `
+                <div class="flex items-center justify-center h-full text-gray-500 text-center p-4">
+                    <p>Error: No se pudo cargar el video para ${bodyType}.<br>Verifica la ruta y el formato (ej. ectomorfo.mp4).</p>
+                </div>
+            `;
+            console.error(`Error al cargar el video: ${staticImgBaseUrl}${bodyType}.mp4`);
+        };
+
+        // Añadimos el video al contenedor div#videoContainerDashboard
+        videoContainerDashboard.appendChild(videoElement);
+    }
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        initWeightChartDashboard(); // Inicializa el gráfico de peso del dashboard
+        loadVideoDashboard(initialBodyTypeDashboard); // Inicializa el video del tipo de cuerpo del dashboard
+    });
+
+    window.addEventListener('resize', initWeightChartDashboard); // Redibuja el gráfico en resize
+    // No necesitamos listener de resize para el video si su contenedor ya es responsivo con padding-top y object-fit
+
+    selectedWeightDisplayDashboard.textContent = "Haz clic en un punto para ver el peso.";
+
+  </script>
 
 {% endblock javascripts %}

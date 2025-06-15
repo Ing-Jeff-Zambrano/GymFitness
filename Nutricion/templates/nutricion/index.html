@@ -1,24 +1,542 @@
-{% extends 'layouts/base.html' %}
-{% load static %}
+{% extends 'layouts/base.html' %} {# Hereda del template base principal #}
 
-{% block title %} Nutricion {% endblock title %}
+{% load static %} {# Para cargar archivos estáticos como progreso.css #}
+
+{% block title %}Análisis de Postura{% endblock %} {# Título específico para esta página #}
 
 {% block stylesheets %}
-    <link rel="stylesheet" href="{% static 'assets/css/nutricion.css' %}">
+    {{ block.super }}
+    <style>
+      /* --- ESTILOS PARA OCULTAR LA BARRA DE NAVEGACIÓN SUPERIOR (SOLO EN ESTA PÁGINA) --- */
+      .main-content > nav.navbar {
+          display: none !important; /* Oculta la barra de navegación */
+      }
+      /* Ajusta el padding superior del contenido principal para que no quede un espacio vacío */
+      .main-content {
+          padding-top: 0 !important; /* Elimina el padding superior por defecto de Argon */
+      }
+      /* Si tu header principal de la página de progreso tiene un margen superior, ajústalo si es necesario */
+      .header.pb-6 {
+          padding-top: 0 !important; /* Asegura que el header empiece desde arriba si no hay navbar */
+          min-height: 400px; /* Mantener la altura mínima de tu banner */
+      }
+      body {
+          font-family: "Inter", sans-serif; /* Si no lo tienes ya en base.html */
+      }
+      #videoContainer {
+          position: relative;
+          width: 100%; /* Sigue tomando el 100% de su padre, pero ahora con un max-width */
+          padding-top: 54%; /* Mantiene la relación de aspecto 16:9 */
+          background-color: #e2e8f0; /* Color de fondo si el video no carga o hay barras */
+          border-radius: 0.5rem; /* Esquinas redondeadas */
+          overflow: hidden;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Sombra */
+
+          /* --- PROPIEDADES CLAVE PARA HACER EL VIDEO MÁS PEQUEÑO Y CENTRARLO --- */
+          max-width: 500px; /* Limita el ancho máximo del contenedor del video. Puedes ajustar este valor (ej. 350px, 500px, etc.) */
+          margin: 0 auto; /* Centra el contenedor horizontalmente dentro de su espacio disponible */
+      }
+      #videoContainer video {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: contain; /* Asegura que la persona se vea completa (sin recortes de cabeza/pies) */
+          border-radius: 0.5rem; /* Asegura que el video también tenga las esquinas redondeadas */
+      }
+    </style>
+    <link rel="stylesheet" href="{% static 'assets/css/progreso.css' %}">
 {% endblock stylesheets %}
 
-{% block content %}
-    <div class="full-background">
-        <div class="content-wrapper">
-            <h1>Bienvenido a tu Seccion de Nutricion</h1>
-            <h1>{{ request.user.username|upper }}</h1>
-            <p>Aquí podrás ver tus rutinas y dietas alimenticias</p>
-            <p>¡Es hora de darle con todo a tu salud dietetica!</p>
-            <a href="#" class="btn-empezar">Empezar</a>
+{% block content %} {# Todo el contenido específico de la página de análisis de video va aquí #}
+
+    <div class="header pb-6 d-flex align-items-center"
+         style="min-height: 300px; background-image: url({% static 'assets/img/theme/profile-cover.jpg' %}); background-size: cover; background-position: center top;">
+        <span class="mask bg-gradient-default opacity-8"></span>
+        <div class="container-fluid d-flex align-items-center">
+            <div class="row">
+                <div class="col-lg-7 col-md-9">
+                    <h1 class="display-2 text-white">
+                        Análisis de Postura
+                    </h1>
+                    <p class="text-white mt-0 mb-1">
+                        Sube un video de tu ejercicio para analizar tu postura y técnica.
+                    </p>
+
+                </div>
+            </div>
         </div>
     </div>
+
+    {# --- INICIO DE LAS NUEVAS SECCIONES DE EJERCICIOS --- #}
+    <div class="container-fluid mt--6"> {# Contenedor principal de las secciones de ejercicios #}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-4"> {# Grid responsivo para 2 columnas en medianos y grandes #}
+
+            {# Sección de Brazos #}
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-2">Brazos</h2>
+                <div class="space-y-6">
+                    {# Ejercicio 1: Curl de Biceps #}
+                    <form id="form_curl_biceps" method="post" action="{% url 'analisis_postura:analizar_video' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
+                            <div class="w-full md:w-1/2">
+                                <h3 class="text-xl font-semibold text-gray-700 mb-2">1.- Curl de Biceps</h3>
+                                <p class="text-gray-600 text-sm">Ejercicio para fortalecer los bíceps.</p>
+                                <input type="hidden" name="exercise_id" value="curl_biceps"> {# Campo oculto para el ID del ejercicio #}
+                            </div>
+                            <div class="w-full md:w-1/2 flex flex-col items-center space-y-4">
+                                <img src="{% static 'assets/img/1.PNG' %}" alt="Imagen de referencia Curl de Biceps" class="rounded-lg shadow-md w-full h-auto object-cover max-w-[300px]">
+
+                                {# BOTONES Y CAMPO DE ARCHIVO #}
+                                <div class="flex flex-col space-y-2 w-full max-w-[300px]">
+                                    <label for="video_file_curl_biceps" class="block text-center py-2 px-4 rounded-lg border-0 text-sm font-semibold bg-blue-500 text-white hover:bg-blue-600 cursor-pointer transition duration-300 ease-in-out transform hover:scale-105 shadow-md">
+                                        Introducir Video
+                                    </label>
+                                    <input type="file" name="video_file" id="video_file_curl_biceps" accept="video/*" class="hidden"> {# CAMBIADO: name="video_file" #}
+
+                                    <button type="submit" data-exercise-id="curl_biceps"
+                                            class="w-full py-2 px-4 text-white font-bold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
+                                            style="background-color: #f56565 !important;">
+                                        Validar Ejercicio
+                                    </button>
+                                    <div id="video_preview_curl_biceps" class="mt-2 w-full hidden"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <hr class="border-gray-200">
+                    {# Ejercicio 2: Extensiones de Tríceps #}
+                    <form id="form_extensiones_triceps" method="post" action="{% url 'analisis_postura:analizar_video' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
+                            <div class="w-full md:w-1/2">
+                                <h3 class="text-xl font-semibold text-gray-700 mb-2">2.- Extensiones de Tríceps</h3>
+                                <p class="text-gray-600 text-sm">Aislamiento y fortalecimiento de tríceps.</p>
+                                <input type="hidden" name="exercise_id" value="extensiones_triceps">
+                            </div>
+                            <div class="w-full md:w-1/2 flex flex-col items-center space-y-4">
+                                <img src="{% static 'assets/img/2.PNG' %}" alt="Imagen de referencia Extensiones de Triceps" class="rounded-lg shadow-md w-full h-auto object-cover max-w-[300px]">
+
+                                {# BOTONES Y CAMPO DE ARCHIVO #}
+                                <div class="flex flex-col space-y-2 w-full max-w-[300px]">
+                                    <label for="video_file_extensiones_triceps" class="block text-center py-2 px-4 rounded-lg border-0 text-sm font-semibold bg-blue-500 text-white hover:bg-blue-600 cursor-pointer transition duration-300 ease-in-out transform hover:scale-105 shadow-md">
+                                        Introducir Video
+                                    </label>
+                                    <input type="file" name="video_file" id="video_file_extensiones_triceps" accept="video/*" class="hidden"> {# CAMBIADO: name="video_file" #}
+
+                                    <button type="submit" data-exercise-id="extensiones_triceps"
+                                            class="w-full py-2 px-4 text-white font-bold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
+                                            style="background-color: #f56565 !important;">
+                                        Validar Ejercicio
+                                    </button>
+                                    <div id="video_preview_extensiones_triceps" class="mt-2 w-full hidden"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {# Sección de Hombros #}
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-2">Hombros</h2>
+                <div class="space-y-6">
+                    {# Ejercicio 3: Press de Hombros #}
+                    <form id="form_press_hombros" method="post" action="{% url 'analisis_postura:analizar_video' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
+                            <div class="w-full md:w-1/2">
+                                <h3 class="text-xl font-semibold text-gray-700 mb-2">3.- Press de Hombros</h3>
+                                <p class="text-gray-600 text-sm">Desarrollo de los deltoides.</p>
+                                <input type="hidden" name="exercise_id" value="press_hombros">
+                            </div>
+                            <div class="w-full md:w-1/2 flex flex-col items-center space-y-4">
+                                <img src="{% static 'assets/img/3.PNG' %}" alt="Imagen de referencia Press de Hombros" class="rounded-lg shadow-md w-full h-auto object-cover max-w-[300px]">
+
+                                {# BOTONES Y CAMPO DE ARCHIVO #}
+                                <div class="flex flex-col space-y-2 w-full max-w-[300px]">
+                                    <label for="video_file_press_hombros" class="block text-center py-2 px-4 rounded-lg border-0 text-sm font-semibold bg-blue-500 text-white hover:bg-blue-600 cursor-pointer transition duration-300 ease-in-out transform hover:scale-105 shadow-md">
+                                        Introducir Video
+                                    </label>
+                                    <input type="file" name="video_file" id="video_file_press_hombros" accept="video/*" class="hidden"> {# CAMBIADO: name="video_file" #}
+
+                                    <button type="submit" data-exercise-id="press_hombros"
+                                            class="w-full py-2 px-4 text-white font-bold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
+                                            style="background-color: #f56565 !important;">
+                                        Validar Ejercicio
+                                    </button>
+                                    <div id="video_preview_press_hombros" class="mt-2 w-full hidden"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <hr class="border-gray-200">
+                    {# Ejercicio 4: Elevaciones Laterales #}
+                    <form id="form_elevaciones_laterales" method="post" action="{% url 'analisis_postura:analizar_video' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
+                            <div class="w-full md:w-1/2">
+                                <h3 class="text-xl font-semibold text-gray-700 mb-2">4.- Elevaciones Laterales</h3>
+                                <p class="text-gray-600 text-sm">Para dar amplitud a los hombros.</p>
+                                <input type="hidden" name="exercise_id" value="elevaciones_laterales">
+                            </div>
+                            <div class="w-full md:w-1/2 flex flex-col items-center space-y-4">
+                                <img src="{% static 'assets/img/4.PNG' %}" alt="Imagen de referencia Elevaciones Laterales" class="rounded-lg shadow-md w-full h-auto object-cover max-w-[300px]">
+
+                                {# BOTONES Y CAMPO DE ARCHIVO #}
+                                <div class="flex flex-col space-y-2 w-full max-w-[300px]">
+                                    <label for="video_file_elevaciones_laterales" class="block text-center py-2 px-4 rounded-lg border-0 text-sm font-semibold bg-blue-500 text-white hover:bg-blue-600 cursor-pointer transition duration-300 ease-in-out transform hover:scale-105 shadow-md">
+                                        Introducir Video
+                                    </label>
+                                    <input type="file" name="video_file" id="video_file_elevaciones_laterales" accept="video/*" class="hidden"> {# CAMBIADO: name="video_file" #}
+
+                                    <button type="submit" data-exercise-id="elevaciones_laterales"
+                                            class="w-full py-2 px-4 text-white font-bold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
+                                            style="background-color: #f56565 !important;">
+                                        Validar Ejercicio
+                                    </button>
+                                    <div id="video_preview_elevaciones_laterales" class="mt-2 w-full hidden"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {# Sección de Espalda #}
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-2">Espalda</h2>
+                <div class="space-y-6">
+                    {# Ejercicio 5: Remo #}
+                    <form id="form_remo" method="post" action="{% url 'analisis_postura:analizar_video' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
+                            <div class="w-full md:w-1/2">
+                                <h3 class="text-xl font-semibold text-gray-700 mb-2">5.- Remo</h3>
+                                <p class="text-gray-600 text-sm">Fortalecimiento de la espalda superior.</p>
+                                <input type="hidden" name="exercise_id" value="remo">
+                            </div>
+                            <div class="w-full md:w-1/2 flex flex-col items-center space-y-4">
+                                <img src="{% static 'assets/img/5.PNG' %}" alt="Imagen de referencia Remo" class="rounded-lg shadow-md w-full h-auto object-cover max-w-[300px]">
+
+                                {# BOTONES Y CAMPO DE ARCHIVO #}
+                                <div class="flex flex-col space-y-2 w-full max-w-[300px]">
+                                    <label for="video_file_remo" class="block text-center py-2 px-4 rounded-lg border-0 text-sm font-semibold bg-blue-500 text-white hover:bg-blue-600 cursor-pointer transition duration-300 ease-in-out transform hover:scale-105 shadow-md">
+                                        Introducir Video
+                                    </label>
+                                    <input type="file" name="video_file" id="video_file_remo" accept="video/*" class="hidden"> {# CAMBIADO: name="video_file" #}
+
+                                    <button type="submit" data-exercise-id="remo"
+                                            class="w-full py-2 px-4 text-white font-bold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
+                                            style="background-color: #f56565 !important;">
+                                        Validar Ejercicio
+                                    </button>
+                                    <div id="video_preview_remo" class="mt-2 w-full hidden"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <hr class="border-gray-200">
+                    {# Ejercicio 6: Peso Muerto #}
+                    <form id="form_peso_muerto" method="post" action="{% url 'analisis_postura:analizar_video' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
+                            <div class="w-full md:w-1/2">
+                                <h3 class="text-xl font-semibold text-gray-700 mb-2">6.- Peso Muerto</h3>
+                                <p class="text-gray-600 text-sm">Ejercicio completo para la espalda y piernas.</p>
+                                <input type="hidden" name="exercise_id" value="peso_muerto">
+                            </div>
+                            <div class="w-full md:w-1/2 flex flex-col items-center space-y-4">
+                                <img src="{% static 'assets/img/6.PNG' %}" alt="Imagen de referencia Peso Muerto" class="rounded-lg shadow-md w-full h-auto object-cover max-w-[300px]">
+
+                                {# BOTONES Y CAMPO DE ARCHIVO #}
+                                <div class="flex flex-col space-y-2 w-full max-w-[300px]">
+                                    <label for="video_file_peso_muerto" class="block text-center py-2 px-4 rounded-lg border-0 text-sm font-semibold bg-blue-500 text-white hover:bg-blue-600 cursor-pointer transition duration-300 ease-in-out transform hover:scale-105 shadow-md">
+                                        Introducir Video
+                                    </label>
+                                    <input type="file" name="video_file" id="video_file_peso_muerto" accept="video/*" class="hidden"> {# CAMBIADO: name="video_file" #}
+
+                                    <button type="submit" data-exercise-id="peso_muerto"
+                                            class="w-full py-2 px-4 text-white font-bold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
+                                            style="background-color: #f56565 !important;">
+                                        Validar Ejercicio
+                                    </button>
+                                    <div id="video_preview_peso_muerto" class="mt-2 w-full hidden"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {# Sección de Pecho #}
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-2">Pecho</h2>
+                <div class="space-y-6">
+                    {# Ejercicio 7: Press de Banca #}
+                    <form id="form_press_banca" method="post" action="{% url 'analisis_postura:analizar_video' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
+                            <div class="w-full md:w-1/2">
+                                <h3 class="text-xl font-semibold text-gray-700 mb-2">7.- Press de Banca</h3>
+                                <p class="text-gray-600 text-sm">Ejercicio fundamental para el pecho.</p>
+                                <input type="hidden" name="exercise_id" value="press_banca">
+                            </div>
+                            <div class="w-full md:w-1/2 flex flex-col items-center space-y-4">
+                                <img src="{% static 'assets/img/7.PNG' %}" alt="Imagen de referencia Press de Banca" class="rounded-lg shadow-md w-full h-auto object-cover max-w-[300px]">
+
+                                {# BOTONES Y CAMPO DE ARCHIVO #}
+                                <div class="flex flex-col space-y-2 w-full max-w-[300px]">
+                                    <label for="video_file_press_banca" class="block text-center py-2 px-4 rounded-lg border-0 text-sm font-semibold bg-blue-500 text-white hover:bg-blue-600 cursor-pointer transition duration-300 ease-in-out transform hover:scale-105 shadow-md">
+                                        Introducir Video
+                                    </label>
+                                    <input type="file" name="video_file" id="video_file_press_banca" accept="video/*" class="hidden"> {# CAMBIADO: name="video_file" #}
+
+                                    <button type="submit" data-exercise-id="press_banca"
+                                            class="w-full py-2 px-4 text-white font-bold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
+                                            style="background-color: #f56565 !important;">
+                                        Validar Ejercicio
+                                    </button>
+                                    <div id="video_preview_press_banca" class="mt-2 w-full hidden"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <hr class="border-gray-200">
+                    {# Ejercicio 8: Apertura con Mancuerna #}
+                    <form id="form_apertura_mancuerna" method="post" action="{% url 'analisis_postura:analizar_video' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
+                            <div class="w-full md:w-1/2">
+                                <h2 class="text-xl font-semibold text-gray-700 mb-2">8.- Apertura con Mancuerna</h2>
+                                <p class="text-gray-600 text-sm">Estiramiento y contracción del pecho.</p>
+                                <input type="hidden" name="exercise_id" value="apertura_mancuerna">
+                            </div>
+                            <div class="w-full md:w-1/2 flex flex-col items-center space-y-4">
+                                <img src="{% static 'assets/img/8.PNG' %}" alt="Imagen de referencia Apertura con Mancuerna" class="rounded-lg shadow-md w-full h-auto object-cover max-w-[300px]">
+
+                                {# BOTONES Y CAMPO DE ARCHIVO #}
+                                <div class="flex flex-col space-y-2 w-full max-w-[300px]">
+                                    <label for="video_file_apertura_mancuerna" class="block text-center py-2 px-4 rounded-lg border-0 text-sm font-semibold bg-blue-500 text-white hover:bg-blue-600 cursor-pointer transition duration-300 ease-in-out transform hover:scale-105 shadow-md">
+                                        Introducir Video
+                                    </label>
+                                    <input type="file" name="video_file" id="video_file_apertura_mancuerna" accept="video/*" class="hidden"> {# CAMBIADO: name="video_file" #}
+
+                                    <button type="submit" data-exercise-id="apertura_mancuerna"
+                                            class="w-full py-2 px-4 text-white font-bold rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
+                                            style="background-color: #f56565 !important;">
+                                        Validar Ejercicio
+                                    </button>
+                                    <div id="video_preview_apertura_mancuerna" class="mt-2 w-full hidden"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {# FIN DE LAS NUEVAS SECCIONES DE EJERCICIOS #}
+
+    {# Aquí se mostrarán los resultados y el video subido de la última validación global #}
+    {% if results %}
+        <div class="results container mt-6">
+            <h2>Resultados del Análisis para {{ results.exercise }}:</h2>
+            <p><strong>Estado:</strong> {{ results.status }}</p>
+            {% if results.total_reps_done is not None %}
+                <p><strong>Repeticiones Totales Realizadas:</strong> {{ results.total_reps_done }}</p>
+                <p><strong>Repeticiones con Buena Forma:</strong> {{ results.good_form_reps_count }}</p>
+                <p><strong>Efectividad:</strong> {{ results.effectiveness_percentage }}%</p>
+                <p><strong>Feedback:</strong> {{ results.feedback }}</p>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {% if video_url %}
+        <div class="video-player container mt-4">
+            <h3>Video Subido (Previsualización):</h3>
+            <video controls autoplay loop>
+                <source src="{{ video_url }}" type="video/mp4">
+                Tu navegador no soporta la reproducción de video.
+            </video>
+        </div>
+    {% endif %}
+
+    {% if error_message %}
+        <div class="error-message container mt-4">
+            <p><strong>Error:</strong> {{ error_message }}</p>
+        </div>
+    {% endif %}
+
     {% include "includes/footer-fullscreen.html" %}
+
 {% endblock content %}
 
 {% block javascripts %}
+    {{ block.super }} {# Mantiene los javascripts de layouts/base.html #}
+    <script>
+        // Objeto para almacenar el archivo seleccionado para cada input de archivo
+        const selectedFiles = {};
+
+        // Mapeo de IDs de ejercicio a los IDs de los elementos de vista previa (si son diferentes)
+        const previewDivs = {
+            'curl_biceps': 'video_preview_curl_biceps',
+            'extensiones_triceps': 'video_preview_extensiones_triceps',
+            'press_hombros': 'video_preview_press_hombros',
+            'elevaciones_laterales': 'video_preview_elevaciones_laterales',
+            'remo': 'video_preview_remo',
+            'peso_muerto': 'video_preview_peso_muerto',
+            'press_banca': 'video_preview_press_banca',
+            'apertura_mancuerna': 'video_preview_apertura_mancuerna',
+        };
+
+        // Escucha cuando el DOM ha cargado completamente para adjuntar eventos
+        document.addEventListener('DOMContentLoaded', () => {
+            // Adjunta listeners para los inputs de tipo 'file'
+            const fileInputs = document.querySelectorAll('input[type="file"][id^="video_file_"]');
+            fileInputs.forEach(input => {
+                input.addEventListener('change', (event) => {
+                    const exerciseId = event.target.id.replace('video_file_', ''); // Obtenemos el ID del ejercicio
+                    const file = event.target.files[0];
+                    selectedFiles[exerciseId] = file; // Guarda el archivo seleccionado
+
+                    const label = document.querySelector(`label[for="video_file_${exerciseId}"]`);
+                    if (label && file) {
+                        label.textContent = `Video Seleccionado: ${file.name}`; // Actualiza el texto del label
+                    } else if (label) {
+                        label.textContent = 'Introducir Video';
+                    }
+
+                    // Limpia la vista previa específica de ese ejercicio
+                    const previewDiv = document.getElementById(previewDivs[exerciseId]);
+                    if (previewDiv) {
+                        previewDiv.innerHTML = '';
+                        previewDiv.classList.add('hidden'); // Oculta la sección de vista previa
+                    }
+                });
+            });
+
+            // Adjunta listeners a los formularios para manejar el envío con AJAX
+            const forms = document.querySelectorAll('form[id^="form_"]');
+            forms.forEach(form => {
+                form.addEventListener('submit', async (event) => {
+                    event.preventDefault(); // Evita el envío tradicional del formulario (recarga de página)
+
+                    const exerciseId = form.querySelector('input[name="exercise_id"]').value;
+                    const fileInput = form.querySelector('input[name="video_file"]');
+                    const file = fileInput.files[0];
+                    const submitButton = form.querySelector('button[type="submit"]');
+                    const previewDiv = document.getElementById(previewDivs[exerciseId]);
+
+
+                    if (!file) {
+                        previewDiv.innerHTML = '<p class="text-red-500 font-semibold">Por favor, selecciona un video primero.</p>';
+                        previewDiv.classList.remove('hidden');
+                        return;
+                    }
+
+                    // Muestra estado de carga
+                    submitButton.disabled = true; // Deshabilita el botón durante el análisis
+                    submitButton.textContent = 'Analizando...'; // Cambia el texto del botón
+                    previewDiv.innerHTML = `
+                        <div class="flex justify-center items-center h-24">
+                            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+                        </div>
+                    `;
+                    previewDiv.classList.remove('hidden');
+
+                    const formData = new FormData(form); // Crea FormData a partir del formulario entero
+
+                    try {
+                        // Obtiene el token CSRF
+                        const csrftoken = getCookie('csrftoken');
+
+                        const response = await fetch(form.action, {
+                            method: 'POST',
+                            body: formData,
+                            headers: { 'X-CSRFToken': csrftoken } // Envía el token CSRF
+                        });
+
+                        if (!response.ok) {
+                            const errorText = await response.text();
+                            console.error('Error de respuesta del servidor:', response.status, errorText);
+                            let errorMessage = `Error del servidor (${response.status}).`;
+                            try {
+                                const errorJson = JSON.parse(errorText);
+                                errorMessage = errorJson.error || errorMessage;
+                            } catch (e) {
+                                // No es JSON, usa el texto sin procesar
+                            }
+                            throw new Error(errorMessage);
+                        }
+
+                        const responseData = await response.json(); // La respuesta es JSON
+
+                        // Crea el elemento de video para previsualización (usando la URL devuelta por Django)
+                        const videoElementHtml = responseData.video_url ? `
+                            <h4 class="font-semibold text-gray-700 mt-4">Video Subido:</h4>
+                            <video controls class="w-full h-auto rounded-md shadow-sm mt-2" src="${responseData.video_url}">
+                                Tu navegador no soporta la reproducción de video.
+                            </video>
+                        ` : '';
+
+                        // Formatea el resultado para mostrarlo en HTML.
+                        // Ahora esperamos 'total_reps_done', 'good_form_reps_count', 'effectiveness_percentage'
+                        // y 'feedback' del views.py (aunque para este paso, solo 'status' y 'exercise' son seguros)
+                        let formattedResult = `
+                            <div class="p-4 bg-gray-100 rounded-lg text-gray-800">
+                                <p><strong>Ejercicio:</strong> ${responseData.exercise}</p>
+                                <p><strong>Estado:</strong> ${responseData.status}</p>
+                        `;
+
+                        // Solo mostramos estos campos si existen en la respuesta (para la fase 2)
+                        if (responseData.total_reps_done !== undefined) {
+                            formattedResult += `<p><strong>Repeticiones Totales Realizadas:</strong> ${responseData.total_reps_done}</p>`;
+                        }
+                        if (responseData.good_form_reps_count !== undefined) {
+                            formattedResult += `<p><strong>Repeticiones con Buena Forma:</strong> ${responseData.good_form_reps_count}</p>`;
+                        }
+                        if (responseData.effectiveness_percentage !== undefined) {
+                            formattedResult += `<p><strong>Efectividad:</strong> ${responseData.effectiveness_percentage.toFixed(1)}%</p>`;
+                        }
+                        if (responseData.feedback) {
+                            formattedResult += `<p class="mt-2"><strong>Feedback:</strong> ${responseData.feedback}</p>`;
+                        }
+
+                        formattedResult += `${videoElementHtml}</div>`; // Cierra el div principal y añade el video
+
+                        previewDiv.innerHTML = formattedResult;
+                        previewDiv.classList.remove('hidden'); // Asegura que la vista previa sea visible
+
+                    } catch (error) {
+                        console.error('Error al procesar el video:', error);
+                        previewDiv.innerHTML = `<p class="text-red-500 font-semibold">Error al procesar el video: ${error.message}.</p>`;
+                        previewDiv.classList.remove('hidden');
+                    } finally {
+                        submitButton.disabled = false; // Habilita el botón
+                        submitButton.textContent = 'Validar Ejercicio'; // Restaura el texto del botón
+                    }
+                });
+            });
+        });
+
+        // Función auxiliar para obtener el token CSRF
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
 {% endblock javascripts %}

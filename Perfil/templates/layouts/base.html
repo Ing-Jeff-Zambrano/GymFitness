@@ -22,8 +22,12 @@
   <!-- Argon CSS -->
   <link rel="stylesheet" href="/static/assets/css/argon.css?v=1.2.0" type="text/css">
 
+  <!-- NOTA: Eliminamos meta tags de caché aquí para evitar posibles conflictos. -->
+
   <!-- Specific CSS goes HERE -->
-  {% block stylesheets %}{% endblock stylesheets %}
+  {% block stylesheets %}
+
+  {% endblock stylesheets %}
 
 </head>
 
@@ -42,7 +46,32 @@
   {% include "includes/scripts.html" %}
 
   <!-- Specific JS goes HERE -->
-  {% block javascripts %}{% endblock javascripts %}
+  {% block javascripts %}
+    {{ block.super }} {# Esto asegura que cualquier JS del template hijo también se incluya #}
+
+    <script>
+        // --- SCRIPT PARA FORZAR RECARGA DE PÁGINAS DESDE CACHÉ DE HISTORIAL (BFCACHE) ---
+
+        // Escucha el evento pageshow, que se dispara cuando una página se carga
+        // incluyendo cuando se recupera de la bfcache (back/forward cache).
+        window.addEventListener('pageshow', function (event) {
+            console.log("Evento pageshow disparado.");
+            // event.persisted es true si la página fue cargada desde bfcache
+            if (event.persisted) {
+                console.log("Página cargada desde bfcache. Forzando recarga para verificar sesión.");
+                // Forzar una recarga completa de la página desde el servidor.
+                // 'true' en reload() significa recargar desde el servidor, no desde la caché del navegador.
+                window.location.reload(true);
+            } else {
+                console.log("Página cargada normalmente (no desde bfcache).");
+            }
+        });
+
+        // NOTA: Con este método, cada vez que el usuario use el botón "atrás" (si la página
+        // estaba en bfcache), habrá una recarga visible de la página. Esto es un trade-off
+        // por la seguridad de la sesión.
+    </script>
+  {% endblock javascripts %}
 
   <script src="/static/assets/js/argon.js?v=1.2.0"></script>
 
