@@ -1,9 +1,76 @@
-*.pyc
+# Directorios y archivos de Python generados automáticamente
 __pycache__/
-myvenv/  # Si usaste un entorno virtual llamado 'myvenv'
-db.sqlite3
-*.log
-*.swp
-.DS_Store
-.idea/workspace.xml
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+/venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.cache/
+.pytest_cache/
+htmlcov/
+build/
+develop-eggs/
+dist/
+eggs/
+.eggs/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Archivos de base de datos
+*.sqlite3
+*.sqlite
+/db.sqlite3
+
+# Archivos específicos del IDE (ej. VS Code, PyCharm, Sublime Text)
+.vscode/
 .idea/
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
+*.swp  # Archivos swap de Vim
+
+# Archivos de logs
+*.log
+log/
+.log
+
+# Archivos temporales de la aplicación (¡Importante para tu proyecto!)
+media/temp_videos/ # Ignora los videos temporales subidos
+media/perfil_pics/ # Ignora las fotos de perfil subidas si no deben versionarse
+
+# Archivos de configuración locales que no deben ir al repositorio
+*.env
+.env
+.flaskenv
+.venv
+
+# Archivos de sistema operativo
+.DS_Store # macOS
+Thumbs.db # Windows
+ehthumbs.db # Windows
+Desktop.ini # Windows
+
+# Archivos de desarrollo específicos
+*.pot
+*.mo
+
+# Archivos de compilación de Cython
+*.c
+
+# Jupyter Notebook files
+.ipynb_checkpoints
+
+# Archivos de configuración de Docker
+.dockerignore
