@@ -1,6 +1,11 @@
 Proyecto Gym Fitness: Análisis de Postura y Seguimiento de Progreso
 Este proyecto es una aplicación web desarrollada con Django que permite a los usuarios subir videos de sus rutinas de ejercicio para análisis de postura. Adicionalmente, ofrece herramientas para el seguimiento de progreso corporal, incluyendo mediciones, cálculo del tipo de cuerpo y visualización del historial de peso.
 
+Integrantes:
+Jefferson Zambrano
+Marlon Aguiño
+Jonathan Perez
+
 🌟 Características Principales
 Autenticación de Usuarios: Registro y login de usuarios para una experiencia personalizada.
 
